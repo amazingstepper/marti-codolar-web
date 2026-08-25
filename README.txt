@@ -43,3 +43,4 @@ SE MANTIENE TODO LO APROBADO EN V1.8.1:
 - Empresa/organización.
 - Netlify Forms.
 - Confirmación de envío.
+GitHub Pages deployment trigger
