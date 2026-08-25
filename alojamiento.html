@@ -1,0 +1,192 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alojamiento — Martí Codolar | Prototipo</title><link rel="stylesheet" href="style.css"></head><body>
+<div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
+<header><div class="container nav"><a class="logo" href="index.html">MARTÍ CODOLAR<small>OBRA SALESIANA</small></a><nav><a href="alojamiento.html"><strong>Alojamiento</strong></a><a href="grupos.html">Grupos</a><a href="salas.html">Salas y eventos</a><a href="index.html#jardines">Jardines</a><a href="index.html#historia">Martí Codolar</a><a href="#solicitud">Contacto</a></nav><div><a class="btn secondary" href="#solicitud">Consultar</a><button class="menu">☰</button></div></div></header>
+<main>
+<section class="page-hero"><div class="container"><div class="breadcrumbs"><a href="index.html">Inicio</a> / Alojamiento</div><div class="eyebrow" style="color:#9b1c31">Hospedería · Martí Codolar</div><h1 style="color:#252525">Alojamiento en Martí Codolar</h1><p class="lead">Un espacio tranquilo para estancias vinculadas a los motivos admitidos por Martí Codolar, en un entorno histórico y natural de Barcelona.</p><a class="btn" href="#solicitud">Consultar disponibilidad y precios</a></div></section>
+<section><div class="container split"><div><div class="eyebrow" style="color:#9b1c31">Antes de reservar</div><h2>¿Es Martí Codolar adecuado para tu estancia?</h2><p class="lead">Martí Codolar no funciona como alojamiento turístico convencional. La solicitud está sujeta a las condiciones de admisión del centro.</p><div class="notice"><strong>Las condiciones comerciales y de admisión definitivas se validarán antes de publicar.</strong><br>Esta zona está preparada para mostrar, de forma muy visible, los motivos de estancia admitidos, requisitos y condiciones antes de enviar la solicitud.</div></div><div class="photo" style="background-image:linear-gradient(180deg,transparent,rgba(0,0,0,.12)),url('https://marti-codolar.net/wp-content/uploads/2023/12/habitacion-doble.jpg')"></div></div></section>
+<section class="soft"><div class="container"><div class="eyebrow" style="color:#9b1c31">Habitaciones</div><h2>Conoce las opciones de alojamiento</h2><p class="lead">Cada tipo de habitación tendrá fotografías, ocupación, características y servicios. No añadimos capacidades o condiciones que todavía no estén validadas.</p><div class="cards"><article class="room-card"><div class="room-placeholder">Fotografía habitación</div><div class="card-body"><h3>Habitación individual</h3><p>Espacio reservado para características y equipamiento confirmados.</p><span class="tag">Información por validar</span></div></article><article class="room-card"><div class="roomimg room1"></div><div class="card-body"><h3>Habitación doble</h3><p>Ficha visual con fotografías y características reales.</p><span class="tag">Fotografía real provisional</span></div></article><article class="room-card"><div class="room-placeholder">Fotografía habitación</div><div class="card-body"><h3>Otras configuraciones</h3><p>Se incorporarán tras validar tipos de habitación, ocupaciones y condiciones.</p><span class="tag">Pendiente validación</span></div></article></div></div></section>
+<section><div class="container"><div class="eyebrow" style="color:#9b1c31">Información práctica</div><h2>Lo importante antes de venir</h2><div class="info-grid"><div class="need"><div class="icon">✓</div><h3>Condiciones de estancia</h3><p>Motivos admitidos, requisitos y condiciones explicados antes del formulario.</p></div><div class="need"><div class="icon">🕒</div><h3>Horarios</h3><p>Check-in, check-out y otros horarios, una vez revisados y confirmados.</p></div><div class="need"><div class="icon">🍽️</div><h3>Servicios</h3><p>Desayuno, restauración, aparcamiento y otros servicios confirmados.</p></div></div></div></section>
+<section class="soft"><div class="container split"><div><div class="eyebrow" style="color:#9b1c31">¿Vienes con un grupo?</div><h2>Tu solicitud puede necesitar otro recorrido</h2><p class="lead">Si organizas una estancia para varias personas, no necesitas decidir entre Hospedería y Albergue.</p><a class="btn secondary" href="grupos.html">Ver página de grupos</a></div><div class="notice"><strong>Decisión de arquitectura aplicada:</strong><br>Los grupos no quedan vinculados únicamente al Albergue. La web los encaminará según sus necesidades.</div></div></section>
+
+<section id="solicitud" class="soft"><div class="container form-wrap"><div class="form-panel">
+<div class="eyebrow" style="color:#9b1c31">Solicitud de alojamiento</div>
+<h2>Consulta disponibilidad</h2>
+<p class="lead">Indica las habitaciones que necesitas. El total de personas se calcula automáticamente según el tipo y la cantidad de habitaciones para facilitar la comprobación de la solicitud.</p>
+
+<form id="accommodationForm" name="solicitud-alojamiento" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" onsubmit="submitAccommodation(event)">
+<input type="hidden" name="form-name" value="solicitud-alojamiento">
+<input type="hidden" name="subject" value="Nueva solicitud de alojamiento — Martí Codolar (%{submissionId})">
+<input type="hidden" id="roomSummary" name="Habitaciones solicitadas">
+<input type="hidden" id="totalPeopleHidden" name="Total de personas">
+<p class="netlify-honeypot"><label>No rellenar: <input name="bot-field"></label></p>
+
+<div class="form-grid two">
+  <div class="field"><label>Fecha de llegada</label><input type="date" name="Fecha de llegada" required></div>
+  <div class="field"><label>Fecha de salida</label><input type="date" name="Fecha de salida" required></div>
+</div>
+
+<div style="margin-top:28px">
+  <h3>Habitaciones solicitadas</h3>
+  <p class="form-note">Puedes combinar diferentes tipos de habitación. Ejemplo: 2 dobles + 1 individual = 5 personas.</p>
+
+  <div id="roomRows" class="form-grid">
+    <div class="form-grid two room-row">
+      <div class="field">
+        <label>Tipo de habitación</label>
+        <select class="room-type" required>
+          <option value="">Selecciona una opción</option>
+          <option value="1">Individual</option>
+          <option value="2">Doble</option>
+          <option value="3">Triple</option>
+          <option value="4">Cuádruple</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Cantidad de habitaciones</label>
+        <input class="room-qty" type="number" min="1" value="1" required>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+    <button class="btn secondary" type="button" onclick="addRoomRow()">+ Añadir otro tipo de habitación</button>
+  </div>
+
+  <div class="field" style="margin-top:18px">
+    <label>Total de personas</label>
+    <input id="totalPeople" type="number" value="0" readonly aria-readonly="true">
+    <small>Campo calculado automáticamente. El usuario no puede modificarlo.</small>
+  </div>
+</div>
+
+<div class="form-grid two" style="margin-top:28px">
+  <div class="field">
+    <label>Motivo de la estancia</label>
+    <select name="Motivo de la estancia" required>
+      <option value="">Selecciona una opción</option>
+      <option>Trabajo</option>
+      <option>Formación / curso</option>
+      <option>Motivo médico</option>
+    </select>
+    <small>Solo se admiten estos tres motivos.</small>
+  </div>
+  <div class="field">
+    <label>Régimen incluido</label>
+    <input type="text" name="Régimen" value="Alojamiento con desayuno incluido" readonly aria-readonly="true">
+    <small>Todas las habitaciones se reservan con desayuno incluido. No se ofrecen opciones de solo alojamiento, media pensión ni pensión completa.</small>
+  </div>
+</div>
+
+<div class="form-grid" style="margin-top:28px">
+  <h3>Datos del solicitante</h3>
+  <div class="form-grid two">
+    <div class="field"><label>Nombre</label><input type="text" name="Nombre" required></div>
+    <div class="field"><label>Apellido 1</label><input type="text" name="Apellido 1" required></div>
+  </div>
+  <div class="form-grid two">
+    <div class="field"><label>Apellido 2</label><input type="text" name="Apellido 2" required></div>
+    <div class="field"><label>Teléfono</label><input type="tel" name="Teléfono"></div>
+  </div>
+  <div class="field"><label>Correo electrónico</label><input type="email" name="email" required></div>
+  <div class="field"><label>Observaciones</label><textarea name="Observaciones" placeholder="Cuéntanos cualquier necesidad relevante."></textarea></div>
+
+  <label class="consent">
+    <input type="checkbox" name="Privacidad aceptada" value="Sí" required>
+    <span>He leído la información sobre las condiciones de alojamiento y acepto la política de privacidad. <small>(Texto legal provisional.)</small></span>
+  </label>
+
+  <div><button class="btn" type="submit">Enviar solicitud</button></div>
+  <div id="formResult" class="form-note"></div>
+</div>
+</form>
+<div id="successBox" class="form-success" role="status" aria-live="polite"><strong>Solicitud enviada correctamente.</strong><p style="margin-bottom:0">Hemos recibido tu solicitud de alojamiento. En breve nuestro equipo se pondrá en contacto contigo para revisar disponibilidad y responder a tu consulta.</p></div>
+</div></div></section>
+
+<script>
+function updateTotalPeople(){
+  let total = 0;
+  document.querySelectorAll('.room-row').forEach(row => {
+    const occupancy = parseInt(row.querySelector('.room-type').value || '0', 10);
+    const qty = parseInt(row.querySelector('.room-qty').value || '0', 10);
+    total += occupancy * qty;
+  });
+  document.getElementById('totalPeople').value = total;
+  const hiddenTotal = document.getElementById('totalPeopleHidden');
+  if(hiddenTotal) hiddenTotal.value = total;
+
+  const parts = [];
+  document.querySelectorAll('.room-row').forEach(row => {
+    const typeSelect = row.querySelector('.room-type');
+    const qtyInput = row.querySelector('.room-qty');
+    const qty = parseInt(qtyInput.value || '0',10);
+    const label = typeSelect.options[typeSelect.selectedIndex]?.text || '';
+    if(typeSelect.value && qty > 0) parts.push(qty + ' × ' + label);
+  });
+  const summary = document.getElementById('roomSummary');
+  if(summary) summary.value = parts.join(' | ');
+}
+
+function bindRoomRow(row){
+  row.querySelector('.room-type').addEventListener('change', updateTotalPeople);
+  row.querySelector('.room-qty').addEventListener('input', updateTotalPeople);
+}
+
+function addRoomRow(){
+  const wrapper = document.createElement('div');
+  wrapper.className = 'form-grid two room-row';
+  wrapper.innerHTML = `
+    <div class="field">
+      <label>Tipo de habitación</label>
+      <select class="room-type" required>
+        <option value="">Selecciona una opción</option>
+        <option value="1">Individual</option>
+        <option value="2">Doble</option>
+        <option value="3">Triple</option>
+        <option value="4">Cuádruple</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Cantidad de habitaciones</label>
+      <div style="display:flex;gap:8px">
+        <input class="room-qty" type="number" min="1" value="1" required>
+        <button type="button" class="btn secondary" onclick="this.closest('.room-row').remove();updateTotalPeople()">Eliminar</button>
+      </div>
+    </div>`;
+  document.getElementById('roomRows').appendChild(wrapper);
+  bindRoomRow(wrapper);
+  updateTotalPeople();
+}
+
+async function submitAccommodation(e){
+  e.preventDefault();
+  updateTotalPeople();
+  const form = e.currentTarget;
+  const button = form.querySelector('button[type="submit"]');
+  button.classList.add('sending');
+  button.textContent = 'Enviando…';
+  document.getElementById('successBox').classList.remove('show');
+  try{
+    const body = new URLSearchParams(new FormData(form)).toString();
+    const response = await fetch('/', {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body
+    });
+    if(!response.ok) throw new Error('HTTP ' + response.status);
+    document.getElementById('successBox').classList.add('show');
+    document.getElementById('successBox').scrollIntoView({behavior:'smooth',block:'center'});
+    form.reset();
+    updateTotalPeople();
+  }catch(err){
+    document.getElementById('formResult').textContent = 'No hemos podido enviar la solicitud. Por favor, inténtalo de nuevo.';
+  }finally{
+    button.classList.remove('sending');
+    button.textContent = 'Enviar solicitud';
+  }
+}
+
+document.querySelectorAll('.room-row').forEach(bindRoomRow);
+updateTotalPeople();
+</script>
+<section class="band"><div class="container"><h2>¿No sabes si este es tu recorrido?</h2><p class="lead">Vuelve a la Home y elige entre alojamiento, grupos, salas o varios servicios.</p><a class="btn" style="background:#fff;color:#9b1c31;border-color:#fff" href="index.html#necesidad">Volver a ¿Qué necesitas?</a></div></section>
+</main><footer><div class="container footer-grid"><div><strong>MARTÍ CODOLAR</strong><p>Prototipo V1.9 · Alojamiento integrado.</p></div><div><strong>Explorar</strong><p><a href="alojamiento.html">Alojamiento</a><br>Grupos<br>Salas y eventos<br>Jardines</p></div><div><strong>Información</strong><p>FAQ<br>Cómo llegar<br>Contacto<br>Privacidad</p></div></div></footer><div class="prototype">ALOJAMIENTO · PROTOTIPO V1.9</div></body></html>
