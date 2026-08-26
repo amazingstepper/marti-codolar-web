@@ -191,6 +191,12 @@
   display:block;
 }
 
+.inventory-summary{
+  margin-top:8px;
+  font-size:.88rem;
+  color:#666;
+}
+
 .suggestion-choice{
   display:flex;
   align-items:flex-start;
@@ -343,7 +349,9 @@ Habitaciones individuales, dobles y otras configuraciones
 según disponibilidad.
 </li>
 
-<li>Desayuno incluido en el alojamiento.</li>
+<li>
+Desayuno incluido en el alojamiento.
+</li>
 
 <li>
 Opción a valorar según las características del grupo.
@@ -688,9 +696,7 @@ para mostrar las opciones disponibles.
 </div>
 
 
-<!-- ======================================================
-     DISTRIBUCIÓN DE HABITACIONES — HOSPEDERÍA
-======================================================= -->
+<!-- DISTRIBUCIÓN DE HABITACIONES -->
 
 <div
 id="bedroomDistributionSection"
@@ -704,17 +710,20 @@ Distribución de habitaciones en Hospedería
 
 <p class="form-note">
 Indica una distribución orientativa.
-El sistema no permitirá asignar más plazas
-que el número total de personas del grupo.
+El sistema tendrá en cuenta tanto el número de personas
+como el inventario máximo disponible de cada tipo de habitación.
 </p>
 
 
 <div class="bedroom-distribution-grid">
 
 
+<!-- INDIVIDUALES -->
+
 <div
 class="bedroom-row"
 data-capacity="1"
+data-pool="standard"
 >
 
 <label class="bedroom-type">
@@ -755,9 +764,12 @@ data-people="individual"
 </div>
 
 
+<!-- DOBLES -->
+
 <div
 class="bedroom-row"
 data-capacity="2"
+data-pool="standard"
 >
 
 <label class="bedroom-type">
@@ -798,9 +810,12 @@ data-people="doble"
 </div>
 
 
+<!-- TRIPLES -->
+
 <div
 class="bedroom-row"
 data-capacity="3"
+data-pool="large"
 >
 
 <label class="bedroom-type">
@@ -841,9 +856,12 @@ data-people="triple"
 </div>
 
 
+<!-- CUÁDRUPLES -->
+
 <div
 class="bedroom-row"
 data-capacity="4"
+data-pool="large"
 >
 
 <label class="bedroom-type">
@@ -1402,6 +1420,14 @@ document.getElementById('departureDate');
 
 
 /* =========================================================
+   INVENTARIO HOSPEDERÍA
+========================================================= */
+
+const STANDARD_ROOM_INVENTORY = 50;
+const LARGE_ROOM_INVENTORY = 4;
+
+
+/* =========================================================
    HOSPEDERÍA / ALBERGUE
 ========================================================= */
 
@@ -1476,7 +1502,7 @@ updateBedroomDistributionVisibility();
 
 
 /* =========================================================
-   DISTRIBUCIÓN HABITACIONES HOSPEDERÍA
+   DISTRIBUCIÓN HABITACIONES
 ========================================================= */
 
 const bedroomDistributionSection =
@@ -1513,6 +1539,9 @@ row.dataset.capacity,
 10
 );
 
+const pool =
+row.dataset.pool;
+
 const checkbox =
 row.querySelector(
 '.bedroom-type-checkbox'
@@ -1530,6 +1559,7 @@ checkbox.dataset.type;
 return {
 row,
 capacity,
+pool,
 checkbox,
 input,
 type
@@ -1565,26 +1595,72 @@ updateBedroomLimits();
 }
 
 
+function getSelectedQty(item){
+
+if(!item.checkbox.checked){
+
+return 0;
+
+}
+
+
+return parseInt(
+item.input.value || '0',
+10
+);
+
+}
+
+
 function calculateAssignedPeople(){
 
 return getBedroomData()
 .reduce(
 (total,item) => {
 
-const qty =
-item.checkbox.checked
-? parseInt(
-item.input.value || '0',
-10
-)
-: 0;
-
 return total +
-(qty * item.capacity);
+(
+getSelectedQty(item) *
+item.capacity
+);
 
 },
 0
 );
+
+}
+
+
+function calculatePoolUsage(pool){
+
+return getBedroomData()
+.filter(
+item =>
+item.pool === pool
+)
+.reduce(
+(total,item) => {
+
+return total +
+getSelectedQty(item);
+
+},
+0
+);
+
+}
+
+
+function getPoolLimit(pool){
+
+if(pool === 'standard'){
+
+return STANDARD_ROOM_INVENTORY;
+
+}
+
+
+return LARGE_ROOM_INVENTORY;
 
 }
 
@@ -1618,7 +1694,9 @@ return;
 }
 
 
-const occupiedByOthers =
+/* PLAZAS OCUPADAS POR LOS DEMÁS TIPOS */
+
+const peopleUsedByOthers =
 bedroomData.reduce(
 (total,item) => {
 
@@ -1632,38 +1710,83 @@ return total;
 }
 
 
-const qty =
-parseInt(
-item.input.value || '0',
-10
-);
-
-
 return total +
-(qty * item.capacity);
+(
+getSelectedQty(item) *
+item.capacity
+);
 
 },
 0
 );
 
 
-const available =
+/* PLAZAS RESTANTES */
+
+const remainingPeople =
 Math.max(
 0,
 totalPeople -
-occupiedByOthers
+peopleUsedByOthers
 );
 
 
-const maxQty =
+/* MÁXIMO POR NÚMERO DE PERSONAS */
+
+const maxByPeople =
 Math.floor(
-available /
+remainingPeople /
 current.capacity
 );
 
 
+/* HABITACIONES DEL MISMO POOL USADAS POR LOS DEMÁS */
+
+const roomsUsedByPoolOthers =
+bedroomData
+.filter(
+item =>
+item !== current &&
+item.pool === current.pool &&
+item.checkbox.checked
+)
+.reduce(
+(total,item) => {
+
+return total +
+getSelectedQty(item);
+
+},
+0
+);
+
+
+/* INVENTARIO RESTANTE DEL POOL */
+
+const poolLimit =
+getPoolLimit(
+current.pool
+);
+
+const maxByInventory =
+Math.max(
+0,
+poolLimit -
+roomsUsedByPoolOthers
+);
+
+
+/* EL MÁXIMO REAL ES EL MENOR DE LOS DOS */
+
+const realMax =
+Math.min(
+maxByPeople,
+maxByInventory
+);
+
+
 current.input.max =
-maxQty;
+realMax;
 
 
 let currentQty =
@@ -1673,13 +1796,13 @@ current.input.value || '0',
 );
 
 
-if(currentQty > maxQty){
+if(currentQty > realMax){
 
 currentQty =
-maxQty;
+realMax;
 
 current.input.value =
-maxQty;
+realMax;
 
 }
 
@@ -1712,16 +1835,12 @@ document.querySelector(
 
 
 const qty =
-item.checkbox.checked
-? parseInt(
-item.input.value || '0',
-10
-)
-: 0;
+getSelectedQty(item);
 
 
 const people =
-qty * item.capacity;
+qty *
+item.capacity;
 
 
 peopleLabel.textContent =
@@ -1751,6 +1870,16 @@ Math.max(
 totalPeople - assigned
 );
 
+const standardUsed =
+calculatePoolUsage(
+'standard'
+);
+
+const largeUsed =
+calculatePoolUsage(
+'large'
+);
+
 
 bedroomSummary.classList.remove(
 'complete',
@@ -1761,12 +1890,20 @@ bedroomSummary.classList.remove(
 if(!totalPeople){
 
 bedroomSummary.innerHTML = `
+
 <strong>
 Personas asignadas: 0
 </strong>
+
 <span>
 Indica el número total de personas del grupo.
 </span>
+
+<div class="inventory-summary">
+Individuales/Dobles: 0 de ${STANDARD_ROOM_INVENTORY} habitaciones ·
+Triples/Cuádruples: 0 de ${LARGE_ROOM_INVENTORY} habitaciones
+</div>
+
 `;
 
 return;
@@ -1781,12 +1918,22 @@ bedroomSummary.classList.add(
 );
 
 bedroomSummary.innerHTML = `
+
 <strong>
 Distribución completa ✓
 </strong>
+
 <span>
 ${assigned} de ${totalPeople} personas asignadas.
 </span>
+
+<div class="inventory-summary">
+Individuales/Dobles:
+${standardUsed} de ${STANDARD_ROOM_INVENTORY} habitaciones ·
+Triples/Cuádruples:
+${largeUsed} de ${LARGE_ROOM_INVENTORY} habitaciones
+</div>
+
 `;
 
 return;
@@ -1802,13 +1949,25 @@ bedroomSummary.classList.add(
 if(suggestDistribution.checked){
 
 bedroomSummary.innerHTML = `
+
 <strong>
-Distribución parcial: ${assigned} de ${totalPeople}
+Distribución parcial:
+${assigned} de ${totalPeople}
 </strong>
+
 <span>
 Quedan ${remaining} personas por distribuir.
-Martí Codolar podrá proponer una distribución para las plazas restantes.
+Martí Codolar podrá proponer una distribución
+para las plazas restantes.
 </span>
+
+<div class="inventory-summary">
+Individuales/Dobles:
+${standardUsed} de ${STANDARD_ROOM_INVENTORY} habitaciones ·
+Triples/Cuádruples:
+${largeUsed} de ${LARGE_ROOM_INVENTORY} habitaciones
+</div>
+
 `;
 
 }
@@ -1816,20 +1975,35 @@ Martí Codolar podrá proponer una distribución para las plazas restantes.
 else{
 
 bedroomSummary.innerHTML = `
+
 <strong>
-Personas asignadas: ${assigned} de ${totalPeople}
+Personas asignadas:
+${assigned} de ${totalPeople}
 </strong>
+
 <span>
 Quedan ${remaining} personas por distribuir.
 Completa la distribución o marca
 “Quiero que Martí Codolar me proponga una distribución”.
 </span>
+
+<div class="inventory-summary">
+Individuales/Dobles:
+${standardUsed} de ${STANDARD_ROOM_INVENTORY} habitaciones ·
+Triples/Cuádruples:
+${largeUsed} de ${LARGE_ROOM_INVENTORY} habitaciones
+</div>
+
 `;
 
 }
 
 }
 
+
+/* =========================================================
+   EVENTOS HABITACIONES
+========================================================= */
 
 getBedroomData()
 .forEach(
@@ -1844,6 +2018,8 @@ if(item.checkbox.checked){
 item.input.disabled =
 false;
 
+
+/* NO AÑADIMOS UNA HABITACIÓN SI YA NO QUEDAN PLAZAS */
 
 const totalPeople =
 parseInt(
