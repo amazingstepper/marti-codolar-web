@@ -877,73 +877,66 @@ const lodgingHelp =
   document.getElementById('lodgingHelp');
 
 
-
 function updateLodgingOptions(){
 
-const size =
-  parseInt(groupSize.value || '0',10);
+  const size =
+    parseInt(groupSize.value || '0',10);
 
-const under45 =
-  size >= 15 && size < 45;
+  const under45 =
+    size >= 15 && size < 45;
 
-const fortyFiveOrMore =
-  size >= 45;
-
-
-
-albergueOption.hidden =
-  !fortyFiveOrMore;
-
-albergueOption.disabled =
-  !fortyFiveOrMore;
+  const fortyFiveOrMore =
+    size >= 45;
 
 
-ambasOption.hidden =
-  !fortyFiveOrMore;
+  albergueOption.hidden =
+    !fortyFiveOrMore;
 
-ambasOption.disabled =
-  !fortyFiveOrMore;
+  albergueOption.disabled =
+    !fortyFiveOrMore;
+
+  ambasOption.hidden =
+    !fortyFiveOrMore;
+
+  ambasOption.disabled =
+    !fortyFiveOrMore;
 
 
+  if(under45){
 
-if(under45){
+    lodgingPreference.value =
+      'hospederia';
 
-lodgingPreference.value =
-  'hospederia';
+    lodgingHelp.textContent =
+      'Para grupos de menos de 45 personas la única opción de alojamiento disponible es la Hospedería.';
 
-lodgingHelp.textContent =
-  'Para grupos de menos de 45 personas la única opción de alojamiento disponible es la Hospedería.';
+  }
 
-}
+  else if(fortyFiveOrMore){
 
-else if(fortyFiveOrMore){
+    if(
+      lodgingPreference.value !== 'hospederia' &&
+      lodgingPreference.value !== 'albergue' &&
+      lodgingPreference.value !== 'ambas'
+    ){
+      lodgingPreference.value = '';
+    }
 
-if(
-  lodgingPreference.value !== 'hospederia' &&
-  lodgingPreference.value !== 'albergue' &&
-  lodgingPreference.value !== 'ambas'
-){
+    lodgingHelp.textContent =
+      'Con 45 personas o más puedes elegir Hospedería, Albergue o valorar ambas opciones.';
 
-lodgingPreference.value = '';
+  }
 
-}
+  else{
 
-lodgingHelp.textContent =
-  'Con 45 personas o más puedes elegir Hospedería, Albergue o valorar ambas opciones.';
+    lodgingPreference.value = '';
 
-}
+    lodgingHelp.textContent =
+      'Indica primero el número total de personas para mostrar las opciones disponibles.';
 
-else{
-
-lodgingPreference.value = '';
-
-lodgingHelp.textContent =
-  'Indica primero el número total de personas para mostrar las opciones disponibles.';
+  }
 
 }
-
-}
-
 
 
 /* ==========================================
@@ -966,21 +959,19 @@ const departureInput =
   document.getElementById('departureDate');
 
 
-
 function formatMealDate(date){
 
-return new Intl.DateTimeFormat(
-  'es-ES',
-  {
-    weekday:'long',
-    day:'numeric',
-    month:'long',
-    year:'numeric'
-  }
-).format(date);
+  return new Intl.DateTimeFormat(
+    'es-ES',
+    {
+      weekday:'long',
+      day:'numeric',
+      month:'long',
+      year:'numeric'
+    }
+  ).format(date);
 
 }
-
 
 
 function createMealService(
@@ -1024,6 +1015,7 @@ function createMealService(
     <div class="meal-people-inline">
 
       <label>
+
         Personas
 
         <input
@@ -1079,306 +1071,167 @@ function createMealService(
   );
 
   return row;
-}
-
-const label =
-  type === 'lunch'
-  ? 'Comida'
-  : 'Cena';
-
-const serviceKey =
-  type === 'lunch'
-  ? 'comida'
-  : 'cena';
-
-
-const row =
-  document.createElement('div');
-
-row.className = 'field';
-
-row.style.marginTop = '12px';
-
-
-
-row.innerHTML = `
-
-<label class="choice">
-
-<input
-  type="checkbox"
-  class="meal-service-checkbox"
-  name="${label} ${dateKey}"
-  value="Sí"
->
-
-${label}
-
-</label>
-
-
-<div
-  class="meal-people"
-  hidden
-  style="margin-top:8px"
->
-
-<label>
-
-Número de personas
-
-<input
-  type="number"
-  name="Personas ${serviceKey} ${dateKey}"
-  min="1"
-  ${defaultPeople ? `max="${defaultPeople}"` : ''}
-  value="${defaultPeople || ''}"
->
-
-</label>
-
-</div>
-
-`;
-
-
-
-const checkbox =
-  row.querySelector(
-    '.meal-service-checkbox'
-  );
-
-const peopleBox =
-  row.querySelector(
-    '.meal-people'
-  );
-
-const peopleInput =
-  peopleBox.querySelector('input');
-
-
-
-checkbox.addEventListener(
-  'change',
-  () => {
-
-peopleBox.hidden =
-  !checkbox.checked;
-
-peopleInput.disabled =
-  !checkbox.checked;
-
-peopleInput.required =
-  checkbox.checked;
-
-
-if(
-  checkbox.checked &&
-  !peopleInput.value &&
-  defaultPeople
-){
-
-peopleInput.value =
-  defaultPeople;
 
 }
-
-});
-
-
-
-peopleInput.disabled = true;
-
-return row;
-
-}
-
 
 
 function generateMealsDays(){
 
-mealsDays.innerHTML = '';
+  mealsDays.innerHTML = '';
+
+  if(!mealsCheckbox.checked){
+
+    mealsSection.hidden = true;
+
+    return;
+
+  }
+
+  mealsSection.hidden = false;
 
 
-if(!mealsCheckbox.checked){
+  if(
+    !arrivalInput.value ||
+    !departureInput.value
+  ){
 
-mealsSection.hidden = true;
+    mealsDays.innerHTML =
+      '<p class="form-note">Indica primero las fechas de llegada y salida para generar los servicios de restauración.</p>';
 
-return;
+    return;
+
+  }
+
+
+  const arrival =
+    new Date(
+      arrivalInput.value +
+      'T12:00:00'
+    );
+
+  const departure =
+    new Date(
+      departureInput.value +
+      'T12:00:00'
+    );
+
+
+  if(departure < arrival){
+
+    mealsDays.innerHTML =
+      '<p class="form-note">La fecha de salida debe ser posterior a la fecha de llegada.</p>';
+
+    return;
+
+  }
+
+
+  const defaultPeople =
+    parseInt(
+      groupSize.value || '0',
+      10
+    );
+
+  const current =
+    new Date(arrival);
+
+
+  while(current <= departure){
+
+    const dateKey =
+
+      current.getFullYear()
+      + '-'
+      + String(
+          current.getMonth()+1
+        ).padStart(2,'0')
+      + '-'
+      + String(
+          current.getDate()
+        ).padStart(2,'0');
+
+
+    const day =
+      document.createElement('div');
+
+    day.className =
+      'conditional-subform';
+
+    day.style.marginTop =
+      '14px';
+
+
+    const title =
+      document.createElement('h4');
+
+    title.style.margin =
+      '0 0 10px';
+
+    title.textContent =
+      formatMealDate(current);
+
+    day.appendChild(title);
+
+
+    const isArrival =
+
+      current.toDateString()
+      ===
+      arrival.toDateString();
+
+    const isDeparture =
+
+      current.toDateString()
+      ===
+      departure.toDateString();
+
+
+    /*
+      LLEGADA:
+      solo Cena
+
+      DÍAS INTERMEDIOS:
+      Comida + Cena
+
+      SALIDA:
+      solo Comida
+    */
+
+    if(!isArrival || isDeparture){
+
+      day.appendChild(
+        createMealService(
+          dateKey,
+          'lunch',
+          defaultPeople
+        )
+      );
+
+    }
+
+
+    if(!isDeparture || isArrival){
+
+      day.appendChild(
+        createMealService(
+          dateKey,
+          'dinner',
+          defaultPeople
+        )
+      );
+
+    }
+
+
+    mealsDays.appendChild(day);
+
+    current.setDate(
+      current.getDate()+1
+    );
+
+  }
 
 }
-
-
-mealsSection.hidden = false;
-
-
-
-if(
-  !arrivalInput.value ||
-  !departureInput.value
-){
-
-mealsDays.innerHTML =
-  '<p class="form-note">Indica primero las fechas de llegada y salida para generar los servicios de restauración.</p>';
-
-return;
-
-}
-
-
-
-const arrival =
-  new Date(
-    arrivalInput.value +
-    'T12:00:00'
-  );
-
-
-const departure =
-  new Date(
-    departureInput.value +
-    'T12:00:00'
-  );
-
-
-
-if(departure < arrival){
-
-mealsDays.innerHTML =
-  '<p class="form-note">La fecha de salida debe ser posterior a la fecha de llegada.</p>';
-
-return;
-
-}
-
-
-
-const defaultPeople =
-  parseInt(
-    groupSize.value || '0',
-    10
-  );
-
-
-
-const current =
-  new Date(arrival);
-
-
-
-while(current <= departure){
-
-
-const dateKey =
-
-current.getFullYear()
-+ '-'
-+ String(
-    current.getMonth()+1
-  ).padStart(2,'0')
-+ '-'
-+ String(
-    current.getDate()
-  ).padStart(2,'0');
-
-
-
-const day =
-  document.createElement('div');
-
-day.className =
-  'conditional-subform';
-
-day.style.marginTop =
-  '14px';
-
-
-
-const title =
-  document.createElement('h4');
-
-title.style.margin =
-  '0 0 10px';
-
-title.textContent =
-  formatMealDate(current);
-
-
-
-day.appendChild(title);
-
-
-
-const isArrival =
-
-current.toDateString()
-===
-arrival.toDateString();
-
-
-const isDeparture =
-
-current.toDateString()
-===
-departure.toDateString();
-
-
-
-/*
-LLEGADA:
-solo Cena
-
-DÍAS INTERMEDIOS:
-Comida + Cena
-
-SALIDA:
-solo Comida
-*/
-
-
-if(!isArrival || isDeparture){
-
-day.appendChild(
-
-createMealService(
-  dateKey,
-  'lunch',
-  defaultPeople
-)
-
-);
-
-}
-
-
-
-if(!isDeparture || isArrival){
-
-day.appendChild(
-
-createMealService(
-  dateKey,
-  'dinner',
-  defaultPeople
-)
-
-);
-
-}
-
-
-
-mealsDays.appendChild(day);
-
-
-current.setDate(
-  current.getDate()+1
-);
-
-}
-
-}
-
 
 
 /* ==========================================
@@ -1389,15 +1242,14 @@ groupSize.addEventListener(
   'input',
   () => {
 
-updateLodgingOptions();
+    updateLodgingOptions();
 
-if(mealsCheckbox.checked){
+    if(mealsCheckbox.checked){
+      generateMealsDays();
+    }
 
-generateMealsDays();
-
-}
-
-});
+  }
+);
 
 
 arrivalInput.addEventListener(
@@ -1421,42 +1273,40 @@ mealsCheckbox.addEventListener(
 updateLodgingOptions();
 
 
-
 /* ==========================================
    ENVÍO — SOLO PROTOTIPO GITHUB PAGES
 ========================================== */
 
 function submitGroup(event){
 
-event.preventDefault();
+  event.preventDefault();
+
+  const form =
+    event.currentTarget;
 
 
-const form =
-  event.currentTarget;
+  if(!form.checkValidity()){
+
+    form.reportValidity();
+
+    return;
+
+  }
 
 
-if(!form.checkValidity()){
-
-form.reportValidity();
-
-return;
-
-}
+  const success =
+    document.getElementById(
+      'groupSuccess'
+    );
 
 
-const success =
-  document.getElementById(
-    'groupSuccess'
-  );
+  success.classList.add('show');
 
 
-success.classList.add('show');
-
-
-success.scrollIntoView({
-  behavior:'smooth',
-  block:'center'
-});
+  success.scrollIntoView({
+    behavior:'smooth',
+    block:'center'
+  });
 
 }
 
