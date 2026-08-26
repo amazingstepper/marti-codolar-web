@@ -40,3 +40,79 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#252525;background:#f
 #groupForm .form-grid.two {
   align-items: start;
 }
+/* V1.9 — Restauración compacta por día */
+
+#mealsDays .conditional-subform{
+  padding:14px 16px;
+}
+
+#mealsDays .conditional-subform h4{
+  margin:0 0 8px;
+  font-size:1rem;
+}
+
+.meal-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:7px 0;
+  border-top:1px solid #eee7e1;
+}
+
+.meal-row:first-of-type{
+  border-top:0;
+}
+
+.meal-choice{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:700;
+  min-width:90px;
+}
+
+.meal-choice input{
+  margin:0;
+}
+
+.meal-people-inline{
+  display:flex;
+  align-items:center;
+}
+
+.meal-people-inline label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:.9rem;
+  color:#555;
+}
+
+.meal-people-input{
+  width:72px !important;
+  padding:8px 9px !important;
+  text-align:center;
+  border-radius:9px !important;
+}
+
+.meal-people-input:disabled{
+  opacity:.42;
+  background:#f3f1ef;
+}
+
+@media(max-width:480px){
+
+  .meal-row{
+    gap:8px;
+  }
+
+  .meal-people-inline label{
+    gap:5px;
+    font-size:.82rem;
+  }
+
+  .meal-people-input{
+    width:62px !important;
+  }
+}
