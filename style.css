@@ -36,3 +36,7 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#252525;background:#f
 
 .conditional-subform{margin-top:18px;padding:20px;border:1px solid #ded6cf;border-radius:18px;background:#fff}
 .conditional-subform[hidden]{display:none}
+/* V1.9 — Alinear campos del formulario de grupos */
+#groupForm .form-grid.two {
+  align-items: start;
+}
