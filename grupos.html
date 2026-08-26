@@ -17,7 +17,7 @@
 <style>
 
 /* =========================================================
-   V1.9 — BLOQUE DE SALAS POR DÍA
+   V1.9 — SALAS POR DÍA
 ========================================================= */
 
 .room-day{
@@ -105,15 +105,101 @@
   cursor:pointer;
 }
 
-.add-room-btn:disabled{
-  opacity:.4;
-  cursor:not-allowed;
-}
-
 .room-day-help{
   margin-top:8px;
   font-size:.84rem;
   color:#666;
+}
+
+
+/* =========================================================
+   V1.9 — DISTRIBUCIÓN DE HABITACIONES
+========================================================= */
+
+#bedroomDistributionSection{
+  margin-top:18px;
+}
+
+.bedroom-distribution-grid{
+  display:grid;
+  gap:8px;
+  margin-top:14px;
+}
+
+.bedroom-row{
+  display:grid;
+  grid-template-columns:minmax(120px,1fr) auto auto;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border:1px solid #e5ded7;
+  border-radius:12px;
+  background:#fff;
+}
+
+.bedroom-type{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:700;
+}
+
+.bedroom-qty-wrap{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:.88rem;
+  color:#555;
+}
+
+.bedroom-qty{
+  width:68px !important;
+  padding:8px !important;
+  text-align:center;
+}
+
+.bedroom-people{
+  min-width:82px;
+  text-align:right;
+  font-size:.85rem;
+  color:#666;
+}
+
+.bedroom-qty:disabled{
+  opacity:.45;
+  background:#f3f1ef;
+}
+
+.bedroom-summary{
+  margin-top:14px;
+  padding:14px 16px;
+  border-radius:12px;
+  background:#f6f3ef;
+}
+
+.bedroom-summary.complete{
+  background:#eef5ee;
+  border:1px solid #bfd1bf;
+}
+
+.bedroom-summary.warning{
+  background:#fff8e7;
+  border:1px solid #ead49d;
+}
+
+.bedroom-summary strong{
+  display:block;
+}
+
+.suggestion-choice{
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+  margin-top:14px;
+  padding:14px;
+  border:1px solid #d8d1ca;
+  border-radius:12px;
+  background:#fff;
 }
 
 @media(min-width:700px){
@@ -122,8 +208,18 @@
     grid-template-columns:105px minmax(220px,1fr) auto;
   }
 
-  .room-remove{
-    padding-bottom:10px;
+}
+
+@media(max-width:520px){
+
+  .bedroom-row{
+    grid-template-columns:1fr auto;
+  }
+
+  .bedroom-people{
+    grid-column:1 / -1;
+    text-align:left;
+    padding-left:26px;
   }
 
 }
@@ -173,9 +269,7 @@ MARTÍ CODOLAR
 <main>
 
 
-<!-- ======================================================
-     HERO
-======================================================= -->
+<!-- HERO -->
 
 <section class="page-hero">
 
@@ -208,9 +302,7 @@ Solicitar disponibilidad y presupuesto
 </section>
 
 
-<!-- ======================================================
-     HOSPEDERÍA / ALBERGUE
-======================================================= -->
+<!-- HOSPEDERÍA / ALBERGUE -->
 
 <section>
 
@@ -251,9 +343,7 @@ Habitaciones individuales, dobles y otras configuraciones
 según disponibilidad.
 </li>
 
-<li>
-Desayuno incluido en el alojamiento.
-</li>
+<li>Desayuno incluido en el alojamiento.</li>
 
 <li>
 Opción a valorar según las características del grupo.
@@ -285,8 +375,7 @@ Solo puede ofrecerse a grupos de 45 personas o más.
 <li>Desayuno incluido.</li>
 
 <li>
-Orientado a grupos que buscan una solución colectiva
-de alojamiento.
+Orientado a grupos que buscan una solución colectiva de alojamiento.
 </li>
 
 </ul>
@@ -314,9 +403,7 @@ Para grupos de 45 personas o más puedes seleccionar
 </section>
 
 
-<!-- ======================================================
-     SERVICIOS
-======================================================= -->
+<!-- SERVICIOS -->
 
 <section class="soft">
 
@@ -387,9 +474,7 @@ en jardines o exteriores.
 </section>
 
 
-<!-- ======================================================
-     INFORMACIÓN PRÁCTICA
-======================================================= -->
+<!-- INFORMACIÓN -->
 
 <section>
 
@@ -408,9 +493,7 @@ Antes de enviar la solicitud
 
 <div class="need">
 
-<h3>
-¿Cuándo se considera grupo?
-</h3>
+<h3>¿Cuándo se considera grupo?</h3>
 
 <p>
 La información actualmente publicada por Martí Codolar
@@ -422,9 +505,7 @@ considera grupo una reserva a partir de 15 personas.
 
 <div class="need">
 
-<h3>
-Entrada y salida
-</h3>
+<h3>Entrada y salida</h3>
 
 <p>
 La información actual indica check-in
@@ -436,9 +517,7 @@ a partir de las 16:00 y check-out a las 11:00.
 
 <div class="need">
 
-<h3>
-Aparcamiento
-</h3>
+<h3>Aparcamiento</h3>
 
 <p>
 Existe aparcamiento sujeto a disponibilidad;
@@ -454,9 +533,7 @@ no se reservan plazas.
 </section>
 
 
-<!-- ======================================================
-     FORMULARIO
-======================================================= -->
+<!-- FORMULARIO -->
 
 <section
 id="solicitud"
@@ -498,9 +575,7 @@ onsubmit="submitGroup(event)"
 
 <div class="field">
 
-<label>
-Fecha de llegada
-</label>
+<label>Fecha de llegada</label>
 
 <input
 id="arrivalDate"
@@ -514,9 +589,7 @@ required
 
 <div class="field">
 
-<label>
-Fecha de salida
-</label>
+<label>Fecha de salida</label>
 
 <input
 id="departureDate"
@@ -530,9 +603,7 @@ required
 
 <div class="field">
 
-<label>
-Número total de personas
-</label>
+<label>Número total de personas</label>
 
 <input
 id="groupSize"
@@ -553,9 +624,7 @@ de 45 personas o más.
 
 <div class="field">
 
-<label>
-Tipo de grupo / entidad
-</label>
+<label>Tipo de grupo / entidad</label>
 
 <input
 type="text"
@@ -565,7 +634,6 @@ required
 >
 
 </div>
-
 
 </div>
 
@@ -620,7 +688,252 @@ para mostrar las opciones disponibles.
 </div>
 
 
-<!-- NECESIDADES ALOJAMIENTO -->
+<!-- ======================================================
+     DISTRIBUCIÓN DE HABITACIONES — HOSPEDERÍA
+======================================================= -->
+
+<div
+id="bedroomDistributionSection"
+class="conditional-subform"
+hidden
+>
+
+<h3 style="margin-top:0">
+Distribución de habitaciones en Hospedería
+</h3>
+
+<p class="form-note">
+Indica una distribución orientativa.
+El sistema no permitirá asignar más plazas
+que el número total de personas del grupo.
+</p>
+
+
+<div class="bedroom-distribution-grid">
+
+
+<div
+class="bedroom-row"
+data-capacity="1"
+>
+
+<label class="bedroom-type">
+
+<input
+type="checkbox"
+class="bedroom-type-checkbox"
+data-type="individual"
+>
+
+Individuales
+
+</label>
+
+<div class="bedroom-qty-wrap">
+
+Cantidad
+
+<input
+type="number"
+class="bedroom-qty"
+data-type="individual"
+name="Habitaciones individuales"
+min="0"
+value="0"
+disabled
+>
+
+</div>
+
+<div
+class="bedroom-people"
+data-people="individual"
+>
+0 personas
+</div>
+
+</div>
+
+
+<div
+class="bedroom-row"
+data-capacity="2"
+>
+
+<label class="bedroom-type">
+
+<input
+type="checkbox"
+class="bedroom-type-checkbox"
+data-type="doble"
+>
+
+Dobles
+
+</label>
+
+<div class="bedroom-qty-wrap">
+
+Cantidad
+
+<input
+type="number"
+class="bedroom-qty"
+data-type="doble"
+name="Habitaciones dobles"
+min="0"
+value="0"
+disabled
+>
+
+</div>
+
+<div
+class="bedroom-people"
+data-people="doble"
+>
+0 personas
+</div>
+
+</div>
+
+
+<div
+class="bedroom-row"
+data-capacity="3"
+>
+
+<label class="bedroom-type">
+
+<input
+type="checkbox"
+class="bedroom-type-checkbox"
+data-type="triple"
+>
+
+Triples
+
+</label>
+
+<div class="bedroom-qty-wrap">
+
+Cantidad
+
+<input
+type="number"
+class="bedroom-qty"
+data-type="triple"
+name="Habitaciones triples"
+min="0"
+value="0"
+disabled
+>
+
+</div>
+
+<div
+class="bedroom-people"
+data-people="triple"
+>
+0 personas
+</div>
+
+</div>
+
+
+<div
+class="bedroom-row"
+data-capacity="4"
+>
+
+<label class="bedroom-type">
+
+<input
+type="checkbox"
+class="bedroom-type-checkbox"
+data-type="cuadruple"
+>
+
+Cuádruples
+
+</label>
+
+<div class="bedroom-qty-wrap">
+
+Cantidad
+
+<input
+type="number"
+class="bedroom-qty"
+data-type="cuadruple"
+name="Habitaciones cuádruples"
+min="0"
+value="0"
+disabled
+>
+
+</div>
+
+<div
+class="bedroom-people"
+data-people="cuadruple"
+>
+0 personas
+</div>
+
+</div>
+
+
+</div>
+
+
+<div
+id="bedroomSummary"
+class="bedroom-summary"
+>
+
+<strong>
+Personas asignadas: 0
+</strong>
+
+<span>
+Indica el número total de personas del grupo.
+</span>
+
+</div>
+
+
+<label class="suggestion-choice">
+
+<input
+id="suggestDistribution"
+type="checkbox"
+name="Solicita propuesta de distribución"
+value="Sí"
+>
+
+<span>
+
+<strong>
+Quiero que Martí Codolar me proponga una distribución
+</strong>
+
+<br>
+
+<small>
+Puedes seguir indicando preferencias parciales,
+por ejemplo habitaciones individuales para responsables,
+y dejar que reservas proponga el resto.
+</small>
+
+</span>
+
+</label>
+
+</div>
+
+
+<!-- NECESIDADES ESPECIALES -->
 
 <div style="margin-top:28px">
 
@@ -636,7 +949,7 @@ Distribución o necesidades especiales
 
 <textarea
 name="Distribución o necesidades de alojamiento"
-placeholder="Ej. preferencia por habitaciones individuales/dobles, responsables en habitaciones separadas, necesidades de accesibilidad, etc."
+placeholder="Ej. responsables en habitaciones separadas, necesidades de accesibilidad, preferencias especiales, etc."
 ></textarea>
 
 </div>
@@ -644,7 +957,7 @@ placeholder="Ej. preferencia por habitaciones individuales/dobles, responsables 
 </div>
 
 
-<!-- OTROS SERVICIOS -->
+<!-- SERVICIOS -->
 
 <div style="margin-top:28px">
 
@@ -713,9 +1026,7 @@ Información sobre aparcamiento/autobús
 </div>
 
 
-<!-- ======================================================
-     RESTAURACIÓN DINÁMICA
-======================================================= -->
+<!-- RESTAURACIÓN -->
 
 <div
 id="mealsSection"
@@ -728,24 +1039,18 @@ Comidas y cenas durante la estancia
 </h3>
 
 <p class="form-note">
-
 Indica qué servicios necesita el grupo cada día
 y para cuántas personas.
-
 El número de personas puede ser diferente
 en cada comida o cena.
-
 </p>
-
 
 <div id="mealsDays"></div>
 
 </div>
 
 
-<!-- ======================================================
-     SALAS DINÁMICAS POR DÍA
-======================================================= -->
+<!-- SALAS -->
 
 <div
 id="roomsSection"
@@ -823,9 +1128,7 @@ required
 
 <div class="field">
 
-<label>
-Entidad / organización
-</label>
+<label>Entidad / organización</label>
 
 <input
 type="text"
@@ -837,9 +1140,7 @@ name="Entidad / organización"
 
 <div class="field">
 
-<label>
-Correo electrónico
-</label>
+<label>Correo electrónico</label>
 
 <input
 type="email"
@@ -852,9 +1153,7 @@ required
 
 <div class="field">
 
-<label>
-Teléfono
-</label>
+<label>Teléfono</label>
 
 <input
 type="tel"
@@ -868,16 +1167,12 @@ required
 </div>
 
 
-<!-- OBSERVACIONES -->
-
 <div
 class="field"
 style="margin-top:18px"
 >
 
-<label>
-Observaciones
-</label>
+<label>Observaciones</label>
 
 <textarea
 name="Observaciones"
@@ -886,8 +1181,6 @@ placeholder="Añade cualquier información relevante para preparar la propuesta.
 
 </div>
 
-
-<!-- PRIVACIDAD -->
 
 <label
 class="consent"
@@ -1083,7 +1376,7 @@ GRUPOS · PROTOTIPO V1.9
 
 
 /* =========================================================
-   HOSPEDERÍA / ALBERGUE
+   ELEMENTOS PRINCIPALES
 ========================================================= */
 
 const groupSize =
@@ -1101,6 +1394,16 @@ document.getElementById('ambasOption');
 const lodgingHelp =
 document.getElementById('lodgingHelp');
 
+const arrivalInput =
+document.getElementById('arrivalDate');
+
+const departureInput =
+document.getElementById('departureDate');
+
+
+/* =========================================================
+   HOSPEDERÍA / ALBERGUE
+========================================================= */
 
 function updateLodgingOptions(){
 
@@ -1166,19 +1469,484 @@ lodgingHelp.textContent =
 
 }
 
+
+updateBedroomDistributionVisibility();
+
 }
+
+
+/* =========================================================
+   DISTRIBUCIÓN HABITACIONES HOSPEDERÍA
+========================================================= */
+
+const bedroomDistributionSection =
+document.getElementById(
+'bedroomDistributionSection'
+);
+
+const bedroomSummary =
+document.getElementById(
+'bedroomSummary'
+);
+
+const suggestDistribution =
+document.getElementById(
+'suggestDistribution'
+);
+
+const bedroomRows =
+[
+...document.querySelectorAll(
+'.bedroom-row'
+)
+];
+
+
+function getBedroomData(){
+
+return bedroomRows.map(
+row => {
+
+const capacity =
+parseInt(
+row.dataset.capacity,
+10
+);
+
+const checkbox =
+row.querySelector(
+'.bedroom-type-checkbox'
+);
+
+const input =
+row.querySelector(
+'.bedroom-qty'
+);
+
+const type =
+checkbox.dataset.type;
+
+
+return {
+row,
+capacity,
+checkbox,
+input,
+type
+};
+
+}
+
+);
+
+}
+
+
+function updateBedroomDistributionVisibility(){
+
+const preference =
+lodgingPreference.value;
+
+const shouldShow =
+preference === 'hospederia' ||
+preference === 'ambas';
+
+
+bedroomDistributionSection.hidden =
+!shouldShow;
+
+
+if(shouldShow){
+
+updateBedroomLimits();
+
+}
+
+}
+
+
+function calculateAssignedPeople(){
+
+return getBedroomData()
+.reduce(
+(total,item) => {
+
+const qty =
+item.checkbox.checked
+? parseInt(
+item.input.value || '0',
+10
+)
+: 0;
+
+return total +
+(qty * item.capacity);
+
+},
+0
+);
+
+}
+
+
+function updateBedroomLimits(){
+
+const totalPeople =
+parseInt(
+groupSize.value || '0',
+10
+);
+
+
+const bedroomData =
+getBedroomData();
+
+
+bedroomData.forEach(
+current => {
+
+if(!current.checkbox.checked){
+
+current.input.disabled = true;
+
+current.input.value = 0;
+
+current.input.max = 0;
+
+return;
+
+}
+
+
+const occupiedByOthers =
+bedroomData.reduce(
+(total,item) => {
+
+if(
+item === current ||
+!item.checkbox.checked
+){
+
+return total;
+
+}
+
+
+const qty =
+parseInt(
+item.input.value || '0',
+10
+);
+
+
+return total +
+(qty * item.capacity);
+
+},
+0
+);
+
+
+const available =
+Math.max(
+0,
+totalPeople -
+occupiedByOthers
+);
+
+
+const maxQty =
+Math.floor(
+available /
+current.capacity
+);
+
+
+current.input.max =
+maxQty;
+
+
+let currentQty =
+parseInt(
+current.input.value || '0',
+10
+);
+
+
+if(currentQty > maxQty){
+
+currentQty =
+maxQty;
+
+current.input.value =
+maxQty;
+
+}
+
+
+current.input.disabled =
+false;
+
+}
+
+);
+
+
+updateBedroomPeopleLabels();
+
+updateBedroomSummary();
+
+}
+
+
+function updateBedroomPeopleLabels(){
+
+getBedroomData()
+.forEach(
+item => {
+
+const peopleLabel =
+document.querySelector(
+`[data-people="${item.type}"]`
+);
+
+
+const qty =
+item.checkbox.checked
+? parseInt(
+item.input.value || '0',
+10
+)
+: 0;
+
+
+const people =
+qty * item.capacity;
+
+
+peopleLabel.textContent =
+`${people} ${people === 1 ? 'persona' : 'personas'}`;
+
+}
+
+);
+
+}
+
+
+function updateBedroomSummary(){
+
+const totalPeople =
+parseInt(
+groupSize.value || '0',
+10
+);
+
+const assigned =
+calculateAssignedPeople();
+
+const remaining =
+Math.max(
+0,
+totalPeople - assigned
+);
+
+
+bedroomSummary.classList.remove(
+'complete',
+'warning'
+);
+
+
+if(!totalPeople){
+
+bedroomSummary.innerHTML = `
+<strong>
+Personas asignadas: 0
+</strong>
+<span>
+Indica el número total de personas del grupo.
+</span>
+`;
+
+return;
+
+}
+
+
+if(assigned === totalPeople){
+
+bedroomSummary.classList.add(
+'complete'
+);
+
+bedroomSummary.innerHTML = `
+<strong>
+Distribución completa ✓
+</strong>
+<span>
+${assigned} de ${totalPeople} personas asignadas.
+</span>
+`;
+
+return;
+
+}
+
+
+bedroomSummary.classList.add(
+'warning'
+);
+
+
+if(suggestDistribution.checked){
+
+bedroomSummary.innerHTML = `
+<strong>
+Distribución parcial: ${assigned} de ${totalPeople}
+</strong>
+<span>
+Quedan ${remaining} personas por distribuir.
+Martí Codolar podrá proponer una distribución para las plazas restantes.
+</span>
+`;
+
+}
+
+else{
+
+bedroomSummary.innerHTML = `
+<strong>
+Personas asignadas: ${assigned} de ${totalPeople}
+</strong>
+<span>
+Quedan ${remaining} personas por distribuir.
+Completa la distribución o marca
+“Quiero que Martí Codolar me proponga una distribución”.
+</span>
+`;
+
+}
+
+}
+
+
+getBedroomData()
+.forEach(
+item => {
+
+item.checkbox.addEventListener(
+'change',
+() => {
+
+if(item.checkbox.checked){
+
+item.input.disabled =
+false;
+
+
+const totalPeople =
+parseInt(
+groupSize.value || '0',
+10
+);
+
+
+const assigned =
+calculateAssignedPeople();
+
+
+if(
+assigned < totalPeople
+){
+
+item.input.value =
+1;
+
+}
+
+}
+
+else{
+
+item.input.value =
+0;
+
+item.input.disabled =
+true;
+
+}
+
+
+updateBedroomLimits();
+
+}
+
+);
+
+
+item.input.addEventListener(
+'input',
+() => {
+
+let value =
+parseInt(
+item.input.value || '0',
+10
+);
+
+
+const max =
+parseInt(
+item.input.max || '0',
+10
+);
+
+
+if(value < 0){
+
+value = 0;
+
+}
+
+
+if(value > max){
+
+value = max;
+
+}
+
+
+item.input.value =
+value;
+
+
+updateBedroomLimits();
+
+}
+
+);
+
+}
+
+);
+
+
+suggestDistribution.addEventListener(
+'change',
+updateBedroomSummary
+);
+
+
+lodgingPreference.addEventListener(
+'change',
+updateBedroomDistributionVisibility
+);
 
 
 /* =========================================================
    FECHAS
 ========================================================= */
-
-const arrivalInput =
-document.getElementById('arrivalDate');
-
-const departureInput =
-document.getElementById('departureDate');
-
 
 function formatDate(date){
 
@@ -1654,9 +2422,7 @@ row.innerHTML = `
 
 <div class="room-request-field">
 
-<label>
-Personas
-</label>
+<label>Personas</label>
 
 <input
 type="number"
@@ -1672,9 +2438,7 @@ value="${defaultPeople || ''}"
 
 <div class="room-request-field">
 
-<label>
-Sala
-</label>
+<label>Sala</label>
 
 <select
 class="room-select"
@@ -2027,6 +2791,8 @@ groupSize.addEventListener(
 
 updateLodgingOptions();
 
+updateBedroomLimits();
+
 
 if(mealsCheckbox.checked){
 
@@ -2104,7 +2870,7 @@ updateLodgingOptions();
 
 
 /* =========================================================
-   ENVÍO — PROTOTIPO GITHUB PAGES
+   VALIDACIÓN DEL PROTOTIPO
 ========================================================= */
 
 function submitGroup(event){
@@ -2121,6 +2887,46 @@ if(!form.checkValidity()){
 form.reportValidity();
 
 return;
+
+}
+
+
+const preference =
+lodgingPreference.value;
+
+
+if(
+preference === 'hospederia' ||
+preference === 'ambas'
+){
+
+const total =
+parseInt(
+groupSize.value || '0',
+10
+);
+
+const assigned =
+calculateAssignedPeople();
+
+
+if(
+assigned !== total &&
+!suggestDistribution.checked
+){
+
+alert(
+'La distribución de habitaciones no cubre a todas las personas del grupo. Completa la distribución o marca “Quiero que Martí Codolar me proponga una distribución”.'
+);
+
+bedroomDistributionSection.scrollIntoView({
+behavior:'smooth',
+block:'center'
+});
+
+return;
+
+}
 
 }
 
