@@ -989,6 +989,98 @@ function createMealService(
   defaultPeople
 ){
 
+  const label =
+    type === 'lunch'
+    ? 'Comida'
+    : 'Cena';
+
+  const serviceKey =
+    type === 'lunch'
+    ? 'comida'
+    : 'cena';
+
+  const row =
+    document.createElement('div');
+
+  row.className = 'meal-row';
+
+  row.innerHTML = `
+
+    <label class="meal-choice">
+
+      <input
+        type="checkbox"
+        class="meal-service-checkbox"
+        name="${label} ${dateKey}"
+        value="Sí"
+      >
+
+      <span class="meal-label">
+        ${label}
+      </span>
+
+    </label>
+
+    <div class="meal-people-inline">
+
+      <label>
+        Personas
+
+        <input
+          type="number"
+          class="meal-people-input"
+          name="Personas ${serviceKey} ${dateKey}"
+          min="1"
+          max="999"
+          value="${defaultPeople || ''}"
+          disabled
+        >
+
+      </label>
+
+    </div>
+
+  `;
+
+  const checkbox =
+    row.querySelector(
+      '.meal-service-checkbox'
+    );
+
+  const peopleInput =
+    row.querySelector(
+      '.meal-people-input'
+    );
+
+  checkbox.addEventListener(
+    'change',
+    () => {
+
+      peopleInput.disabled =
+        !checkbox.checked;
+
+      peopleInput.required =
+        checkbox.checked;
+
+      if(
+        checkbox.checked &&
+        !peopleInput.value &&
+        defaultPeople
+      ){
+        peopleInput.value =
+          defaultPeople;
+      }
+
+      if(checkbox.checked){
+        peopleInput.focus();
+      }
+
+    }
+  );
+
+  return row;
+}
+
 const label =
   type === 'lunch'
   ? 'Comida'
