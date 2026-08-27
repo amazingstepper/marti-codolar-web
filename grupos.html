@@ -196,9 +196,14 @@
 }
 
 .inventory-summary{
-  margin-top:8px;
+  margin-top:10px;
   font-size:.88rem;
   color:#666;
+  line-height:1.55;
+}
+
+.inventory-summary div{
+  display:block;
 }
 
 .suggestion-choice{
@@ -1876,6 +1881,40 @@ getSelectedQty(item);
 
 
 /* =========================================================
+   CONTADORES POR TIPO
+========================================================= */
+
+function getBedroomQuantity(type){
+
+const item =
+getBedroomData().find(
+room =>
+room.type === type
+);
+
+
+if(!item){
+
+return 0;
+
+}
+
+
+return getSelectedQty(item);
+
+}
+
+
+function bedroomWord(quantity){
+
+return quantity === 1
+? 'habitación'
+: 'habitaciones';
+
+}
+
+
+/* =========================================================
    RESUMEN HABITACIONES
 ========================================================= */
 
@@ -1906,6 +1945,64 @@ label.textContent =
 }
 
 
+function getBedroomTypeSummary(){
+
+const individuales =
+getBedroomQuantity(
+'individual'
+);
+
+const dobles =
+getBedroomQuantity(
+'doble'
+);
+
+const triples =
+getBedroomQuantity(
+'triple'
+);
+
+const cuadruples =
+getBedroomQuantity(
+'cuadruple'
+);
+
+
+return `
+
+<div class="inventory-summary">
+
+<div>
+Individuales:
+<strong>${individuales}</strong>
+${bedroomWord(individuales)}
+</div>
+
+<div>
+Dobles:
+<strong>${dobles}</strong>
+${bedroomWord(dobles)}
+</div>
+
+<div>
+Triples:
+<strong>${triples}</strong>
+${bedroomWord(triples)}
+</div>
+
+<div>
+Cuádruples:
+<strong>${cuadruples}</strong>
+${bedroomWord(cuadruples)}
+</div>
+
+</div>
+
+`;
+
+}
+
+
 function updateBedroomSummary(){
 
 const totalPeople =
@@ -1921,16 +2018,6 @@ const remaining =
 Math.max(
 0,
 totalPeople - assigned
-);
-
-const standardUsed =
-calculatePoolUsage(
-'standard'
-);
-
-const largeUsed =
-calculatePoolUsage(
-'large'
 );
 
 
@@ -1952,17 +2039,7 @@ Personas asignadas: 0
 Indica el número total de personas del grupo.
 </span>
 
-<div class="inventory-summary">
-
-Individuales/Dobles:
-0 de ${STANDARD_ROOM_INVENTORY} habitaciones
-
-<br>
-
-Triples/Cuádruples:
-0 de ${LARGE_ROOM_INVENTORY} habitaciones
-
-</div>
+${getBedroomTypeSummary()}
 
 `;
 
@@ -1987,17 +2064,7 @@ Distribución completa ✓
 ${assigned} de ${totalPeople} personas asignadas.
 </span>
 
-<div class="inventory-summary">
-
-Individuales/Dobles:
-${standardUsed} de ${STANDARD_ROOM_INVENTORY} habitaciones
-
-<br>
-
-Triples/Cuádruples:
-${largeUsed} de ${LARGE_ROOM_INVENTORY} habitaciones
-
-</div>
+${getBedroomTypeSummary()}
 
 `;
 
@@ -2029,17 +2096,7 @@ para las plazas restantes.
 
 </span>
 
-<div class="inventory-summary">
-
-Individuales/Dobles:
-${standardUsed} de ${STANDARD_ROOM_INVENTORY} habitaciones
-
-<br>
-
-Triples/Cuádruples:
-${largeUsed} de ${LARGE_ROOM_INVENTORY} habitaciones
-
-</div>
+${getBedroomTypeSummary()}
 
 `;
 
@@ -2063,17 +2120,7 @@ Completa la distribución o marca
 
 </span>
 
-<div class="inventory-summary">
-
-Individuales/Dobles:
-${standardUsed} de ${STANDARD_ROOM_INVENTORY} habitaciones
-
-<br>
-
-Triples/Cuádruples:
-${largeUsed} de ${LARGE_ROOM_INVENTORY} habitaciones
-
-</div>
+${getBedroomTypeSummary()}
 
 `;
 
@@ -2103,10 +2150,6 @@ data.forEach(
 current => {
 
 
-/* ---------------------------------------------------------
-   HABITACIONES UTILIZADAS POR OTROS TIPOS DEL MISMO POOL
---------------------------------------------------------- */
-
 const roomsUsedByOthers =
 data
 .filter(
@@ -2122,10 +2165,6 @@ getSelectedQty(other),
 );
 
 
-/* ---------------------------------------------------------
-   INVENTARIO RESTANTE PARA ESTE TIPO
---------------------------------------------------------- */
-
 const inventoryRemaining =
 Math.max(
 0,
@@ -2133,10 +2172,6 @@ getPoolLimit(current.pool) -
 roomsUsedByOthers
 );
 
-
-/* ---------------------------------------------------------
-   PERSONAS ASIGNADAS POR LOS DEMÁS TIPOS
---------------------------------------------------------- */
 
 const peopleUsedByOthers =
 data
@@ -2158,10 +2193,6 @@ other.capacity
 );
 
 
-/* ---------------------------------------------------------
-   PERSONAS RESTANTES
---------------------------------------------------------- */
-
 const peopleRemaining =
 Math.max(
 0,
@@ -2170,20 +2201,12 @@ peopleUsedByOthers
 );
 
 
-/* ---------------------------------------------------------
-   MÁXIMO DE HABITACIONES POR PERSONAS
---------------------------------------------------------- */
-
 const maxByPeople =
 Math.floor(
 peopleRemaining /
 current.capacity
 );
 
-
-/* ---------------------------------------------------------
-   MÁXIMO REAL
---------------------------------------------------------- */
 
 const realMax =
 Math.max(
@@ -2194,10 +2217,6 @@ maxByPeople
 )
 );
 
-
-/* ---------------------------------------------------------
-   TIPO SELECCIONADO
---------------------------------------------------------- */
 
 if(current.checkbox.checked){
 
@@ -2239,10 +2258,6 @@ qty;
 }
 
 
-/* ---------------------------------------------------------
-   TIPO NO SELECCIONADO
---------------------------------------------------------- */
-
 else{
 
 current.input.value =
@@ -2254,11 +2269,6 @@ true;
 current.input.max =
 realMax;
 
-
-/*
-El checkbox solo se puede activar
-si quedan habitaciones Y plazas suficientes.
-*/
 
 current.checkbox.disabled =
 (
@@ -2317,24 +2327,12 @@ getBedroomData()
 item => {
 
 
-/* ---------------------------------------------------------
-   CHECKBOX
---------------------------------------------------------- */
-
 item.checkbox.addEventListener(
 'change',
 () => {
 
 
 if(item.checkbox.checked){
-
-/*
-IMPORTANTE:
-
-Marcar el tipo solamente activa el contador.
-
-SIEMPRE empieza en 0.
-*/
 
 item.input.value =
 0;
@@ -2345,10 +2343,6 @@ false;
 }
 
 else{
-
-/*
-Desmarcar libera el inventario.
-*/
 
 item.input.value =
 0;
@@ -2365,10 +2359,6 @@ updateBedroomState();
 
 );
 
-
-/* ---------------------------------------------------------
-   CANTIDAD
---------------------------------------------------------- */
 
 item.input.addEventListener(
 'input',
@@ -2836,8 +2826,6 @@ const isDeparture =
 index === dates.length-1;
 
 
-/* Llegada: solo cena */
-
 if(
 !isArrival ||
 isDeparture
@@ -2855,8 +2843,6 @@ defaultPeople
 
 }
 
-
-/* Salida: solo comida */
 
 if(
 !isDeparture ||
