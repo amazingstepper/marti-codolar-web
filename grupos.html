@@ -100,6 +100,12 @@
   cursor:pointer;
 }
 
+.room-day-help{
+  margin-top:8px;
+  font-size:.84rem;
+  color:#666;
+}
+
 
 /* =========================================================
    HOSPEDERÍA
@@ -466,15 +472,27 @@
   border-radius:20px;
   background:#fff;
   overflow:hidden;
+
+  transition:
+    background-color .25s ease,
+    border-color .25s ease;
 }
 
 .final-summary-header{
   padding:20px;
   background:#fbf5f6;
+
+  transition:
+    background-color .25s ease,
+    border-color .25s ease;
 }
 
 .final-summary-body{
   padding:20px;
+  background:#fff;
+
+  transition:
+    background-color .25s ease;
 }
 
 .summary-section{
@@ -507,7 +525,7 @@
 
 
 /* =========================================================
-   CONFIRMACIÓN FINAL
+   CONFIRMACIÓN FINAL — PENDIENTE
 ========================================================= */
 
 .summary-confirm{
@@ -517,18 +535,48 @@
   padding:18px 20px;
   border-top:1px solid #e0c5ca;
   background:#fbf5f6;
+
   transition:
     background-color .25s ease,
     border-color .25s ease;
 }
 
-.summary-confirm.confirmed{
-  background:#eef5ee;
-  border-top-color:#bfd1bf;
-}
-
 .summary-confirm input{
   margin-top:4px;
+}
+
+
+/* =========================================================
+   RESUMEN FINAL — CONFIRMADO
+
+   Toda la caja se convierte en verde:
+   - marco
+   - cabecera
+   - cuerpo
+   - pie
+========================================================= */
+
+.final-summary.confirmed{
+  border-color:#bfd1bf;
+  background:#eef5ee;
+}
+
+.final-summary.confirmed .final-summary-header{
+  background:#eef5ee;
+  border-color:#bfd1bf;
+}
+
+.final-summary.confirmed .final-summary-body{
+  background:#f7faf7;
+}
+
+.final-summary.confirmed .summary-section{
+  border-color:#d6e4d6;
+}
+
+.final-summary.confirmed .summary-confirm{
+  background:#eef5ee;
+  border-color:#bfd1bf;
 }
 
 
@@ -841,7 +889,7 @@ Desayuno incluido.
 
 
 <!-- ======================================================
-     SERVICIOS — DISEÑO ANTERIOR
+     SERVICIOS
 ======================================================= -->
 
 <section class="soft">
@@ -977,7 +1025,7 @@ Antes de enviar la solicitud
 <div class="need">
 
 <h3>
-¿Cuando se considera grupo?
+¿Cuándo se considera grupo?
 </h3>
 
 <p>
@@ -1523,8 +1571,6 @@ se alojarán en cada una.
 <div class="hostel-room-grid">
 
 
-<!-- 1212 -->
-
 <div
 class="hostel-room-row"
 data-hostel-capacity="16"
@@ -1571,8 +1617,6 @@ disabled
 
 </div>
 
-
-<!-- 1213 -->
 
 <div
 class="hostel-room-row"
@@ -1621,8 +1665,6 @@ disabled
 </div>
 
 
-<!-- 1214 -->
-
 <div
 class="hostel-room-row"
 data-hostel-capacity="16"
@@ -1670,8 +1712,6 @@ disabled
 </div>
 
 
-<!-- 1216 -->
-
 <div
 class="hostel-room-row"
 data-hostel-capacity="22"
@@ -1718,8 +1758,6 @@ disabled
 
 </div>
 
-
-<!-- 1215 -->
 
 <div
 class="hostel-room-row"
@@ -1979,8 +2017,9 @@ Salas durante la estancia
 <p class="form-note">
 
 Marca los días en los que el grupo necesita una sala.
-Puedes solicitar varias salas el mismo día
-y especificar un número diferente de asistentes para cada una.
+Puedes solicitar varias salas el mismo día.
+Una sala ya seleccionada ese día dejará de estar disponible
+en las siguientes líneas.
 
 </p>
 
@@ -2457,8 +2496,8 @@ const summaryConfirmation =
 document.getElementById('summaryConfirmation');
 
 
-const summaryConfirmationBox =
-document.getElementById('summaryConfirmationBox');
+const finalSummary =
+document.getElementById('finalSummary');
 
 
 const finalSummaryBody =
@@ -2662,14 +2701,6 @@ lodgingPreference.value === 'combinado'
 
 }
 
-
-/*
-La regla de acceso al Albergue se controla aquí
-y en la validación final.
-
-No la utilizamos para informar sobre la distribución.
-La distribución siempre trabaja con el tamaño real del grupo.
-*/
 
 function updateLodgingOptions(){
 
@@ -3385,14 +3416,6 @@ getHostelPeople(item);
 }
 
 
-/*
-El límite visible y operativo
-es el número real del grupo.
-
-El mínimo comercial de utilización del Albergue
-NO interviene en este cálculo.
-*/
-
 function getMaxPeopleAvailableForHostel(){
 
 const groupTotal =
@@ -3564,15 +3587,9 @@ return;
 }
 
 
-let status = '';
+let status =
+'';
 
-
-/*
-SOLO ALBERGUE:
-
-la referencia visual es SIEMPRE
-el número total del grupo.
-*/
 
 if(
 lodgingPreference.value === 'albergue'
@@ -3617,14 +3634,6 @@ hostelSummary.classList.add(
 }
 
 
-/*
-ALOJAMIENTO COMBINADO:
-
-la distribución se considera completa
-cuando Hospedería + Albergue coincide
-con el número total del grupo.
-*/
-
 else if(
 lodgingPreference.value === 'combinado'
 ){
@@ -3668,11 +3677,6 @@ hostelSummary.classList.add(
 }
 
 
-/*
-Habitaciones visibles:
-solo habitaciones con personas asignadas.
-*/
-
 let roomLines =
 '';
 
@@ -3710,7 +3714,7 @@ hostelSummary.innerHTML = `
 
 <strong>
 
-Personas del grupo: ${groupTotal}
+Albergue — Personas asignadas: ${assigned}
 
 </strong>
 
@@ -3810,7 +3814,7 @@ updateAllAccommodationStates();
 
 
 /* =========================================================
-   ACTUALIZACIÓN CONJUNTA DEL ALOJAMIENTO
+   ACTUALIZACIÓN CONJUNTA
 ========================================================= */
 
 let updatingAccommodation =
@@ -4593,8 +4597,6 @@ const departure =
 index === dates.length-1;
 
 
-/* llegada → cena */
-
 if(
 !arrival ||
 departure
@@ -4609,8 +4611,6 @@ key,
 
 }
 
-
-/* salida → comida */
 
 if(
 !departure ||
@@ -4930,11 +4930,64 @@ capacity:200
 ];
 
 
+/* =========================================================
+   INVENTARIO DIARIO DE SALAS
+========================================================= */
+
+/*
+Devuelve las salas ya utilizadas
+en las otras líneas del mismo día.
+
+La propia selección de la línea actual
+no se considera ocupada para sí misma.
+*/
+
+function getSelectedRoomsForDay(
+day,
+excludeSelect=null
+){
+
+return [
+...day.querySelectorAll(
+'.room-select'
+)
+]
+.filter(
+select =>
+select !== excludeSelect &&
+select.value
+)
+.map(
+select =>
+select.value
+);
+
+}
+
+
+/*
+Rellena un selector teniendo en cuenta:
+
+1. capacidad solicitada
+2. salas ya seleccionadas ese mismo día
+
+La sala seleccionada por el propio selector
+puede conservarse.
+*/
+
 function fillRoomSelect(
 select,
 people,
+day,
 previous=''
 ){
+
+const occupiedRooms =
+getSelectedRoomsForDay(
+day,
+select
+);
+
 
 select.innerHTML =
 '<option value="">Quiero que me recomendéis una sala</option>';
@@ -4942,8 +4995,19 @@ select.innerHTML =
 
 availableRooms
 .filter(
-room =>
-room.capacity >= people
+room => {
+
+return (
+room.capacity >= people &&
+(
+!occupiedRooms.includes(
+room.name
+) ||
+room.name === previous
+)
+);
+
+}
 )
 .forEach(
 room => {
@@ -4972,6 +5036,7 @@ option
 
 
 if(
+previous &&
 [
 ...select.options
 ]
@@ -4986,12 +5051,80 @@ previous;
 
 }
 
+else{
+
+select.value =
+'';
+
+}
+
 }
 
 
+/*
+Después de cualquier cambio de sala,
+recalculamos todos los selectores
+del MISMO día.
+*/
+
+function refreshRoomSelectsForDay(day){
+
+const selects =
+[
+...day.querySelectorAll(
+'.room-select'
+)
+];
+
+
+selects.forEach(
+select => {
+
+
+const row =
+select.closest(
+'.room-request-row'
+);
+
+
+const peopleInput =
+row.querySelector(
+'.room-attendees-input'
+);
+
+
+const people =
+parseInt(
+peopleInput.value || '0',
+10
+);
+
+
+const previous =
+select.value;
+
+
+fillRoomSelect(
+select,
+people,
+day,
+previous
+);
+
+}
+);
+
+}
+
+
+/* =========================================================
+   CREAR SOLICITUD DE SALA
+========================================================= */
+
 function createRoomRequest(
 number,
-people
+people,
+day
 ){
 
 const row =
@@ -5072,14 +5205,10 @@ row.querySelector(
 );
 
 
-fillRoomSelect(
-select,
-parseInt(
-input.value || '0',
-10
-)
-);
-
+/*
+Se añade primero la línea al DOM
+y después se rellenará desde createRoomDay.
+*/
 
 input.addEventListener(
 'input',
@@ -5096,8 +5225,38 @@ parseInt(
 input.value || '0',
 10
 ),
+day,
 previous
 );
+
+
+refreshRoomSelectsForDay(
+day
+);
+
+}
+);
+
+
+/*
+CAMBIO DE SALA:
+
+al seleccionar una sala,
+se descuenta automáticamente
+del inventario del resto de líneas del día.
+*/
+
+select.addEventListener(
+'change',
+() => {
+
+
+refreshRoomSelectsForDay(
+day
+);
+
+
+updateFinalSummary();
 
 }
 );
@@ -5118,6 +5277,17 @@ remove.onclick =
 row.remove();
 
 
+/*
+Al eliminar una línea,
+su sala vuelve automáticamente
+al inventario de ese día.
+*/
+
+refreshRoomSelectsForDay(
+day
+);
+
+
 updateFinalSummary();
 
 };
@@ -5129,6 +5299,10 @@ return row;
 
 }
 
+
+/* =========================================================
+   CREAR DÍA DE SALAS
+========================================================= */
 
 function createRoomDay(date){
 
@@ -5189,6 +5363,14 @@ class="add-room-btn"
 </button>
 
 
+<div class="room-day-help">
+
+Cada sala física puede seleccionarse una sola vez
+en el mismo día.
+
+</div>
+
+
 </div>
 
 `;
@@ -5224,16 +5406,47 @@ let counter =
 
 function add(){
 
-requests.appendChild(
-
+const row =
 createRoomRequest(
 counter,
 parseInt(
 groupSize.value || '0',
 10
-)
-)
+),
+day
+);
 
+
+requests.appendChild(
+row
+);
+
+
+const select =
+row.querySelector(
+'.room-select'
+);
+
+
+const people =
+parseInt(
+row.querySelector(
+'.room-attendees-input'
+).value || '0',
+10
+);
+
+
+fillRoomSelect(
+select,
+people,
+day,
+''
+);
+
+
+refreshRoomSelectsForDay(
+day
 );
 
 
@@ -5292,6 +5505,10 @@ return day;
 
 }
 
+
+/* =========================================================
+   GENERAR DÍAS DE SALA
+========================================================= */
 
 function generateRoomDays(){
 
@@ -5520,12 +5737,15 @@ habitaciones
 /* ---------------------------------------------------------
    ALBERGUE
 
-   IMPORTANTE:
-   El encabezado muestra el número del GRUPO.
-   Nunca el mínimo interno del Albergue.
+   MISMA LÓGICA QUE HOSPEDERÍA:
+   se muestra el número asignado al Albergue.
 --------------------------------------------------------- */
 
 if(usesHostel()){
+
+const hostelAssigned =
+calculateHostelPeople();
+
 
 html += `
 
@@ -5533,8 +5753,8 @@ html += `
 
 Albergue —
 <strong>
-Nº de personas del grupo:
-${groupTotal}
+Personas asignadas:
+${hostelAssigned}
 </strong>
 
 </li>
@@ -5576,33 +5796,10 @@ ${people} personas
 }
 
 
-/* ---------------------------------------------------------
-   TOTAL
-
-   Solo se muestra como "grupo".
-   Nunca se utiliza el mínimo del Albergue.
---------------------------------------------------------- */
-
-if(
-lodgingPreference.value === 'albergue'
-){
-
-html += `
-
-<li>
-
-Personas del grupo:
-<strong>
-${groupTotal}
-</strong>
-
-</li>
-
-`;
-
-}
-
-else{
+/*
+El total del grupo se muestra una única vez
+como referencia final de alojamiento.
+*/
 
 html += `
 
@@ -5616,8 +5813,6 @@ ${groupTotal}
 </li>
 
 `;
-
-}
 
 
 if(lodgingNeeds.value.trim()){
@@ -6344,14 +6539,14 @@ observations
 
 
 /* =========================================================
-   CAJA DE CONFIRMACIÓN
+   CONFIRMACIÓN DEL RESUMEN
 ========================================================= */
 
 function updateSummaryConfirmationState(){
 
 if(summaryConfirmation.checked){
 
-summaryConfirmationBox.classList.add(
+finalSummary.classList.add(
 'confirmed'
 );
 
@@ -6359,7 +6554,7 @@ summaryConfirmationBox.classList.add(
 
 else{
 
-summaryConfirmationBox.classList.remove(
+finalSummary.classList.remove(
 'confirmed'
 );
 
@@ -6369,9 +6564,8 @@ summaryConfirmationBox.classList.remove(
 
 
 /*
-Si se modifica cualquier dato después
-de haber confirmado, vuelve automáticamente
-al estado pendiente / rojo pálido.
+Cualquier modificación posterior
+anula la revisión anterior.
 */
 
 function markSummaryAsChanged(event){
@@ -6398,15 +6592,9 @@ updateFinalSummary();
 }
 
 
-/*
-Al seleccionar la confirmación:
-rojo pálido → verde suave.
-*/
-
 summaryConfirmation.addEventListener(
 'change',
 () => {
-
 
 updateSummaryConfirmationState();
 
@@ -6592,9 +6780,7 @@ return;
 }
 
 
-/* ---------------------------------------------------------
-   FECHAS
---------------------------------------------------------- */
+/* FECHAS */
 
 if(
 arrivalInput.value &&
@@ -6615,9 +6801,7 @@ return;
 }
 
 
-/* ---------------------------------------------------------
-   ALOJAMIENTO
---------------------------------------------------------- */
+/* ALOJAMIENTO */
 
 const preference =
 lodgingPreference.value;
@@ -6652,11 +6836,8 @@ hospederiaTotal;
 
 
 /*
-La regla mínima del Albergue
-se controla internamente.
-
-No aparece en el resumen ni en las cajas
-de distribución del usuario.
+Condición interna del Albergue.
+No aparece en los resúmenes de distribución.
 */
 
 if(
@@ -6680,11 +6861,7 @@ return;
 }
 
 
-/* ---------------------------------------------------------
-   SOLO ALBERGUE
-
-   El objetivo SIEMPRE es el número real del grupo.
---------------------------------------------------------- */
+/* SOLO ALBERGUE */
 
 if(
 preference === 'albergue' &&
@@ -6707,9 +6884,7 @@ return;
 }
 
 
-/* ---------------------------------------------------------
-   SOLO HOSPEDERÍA
---------------------------------------------------------- */
+/* SOLO HOSPEDERÍA */
 
 if(
 preference === 'hospederia' &&
@@ -6733,9 +6908,7 @@ return;
 }
 
 
-/* ---------------------------------------------------------
-   HOSPEDERÍA + ALBERGUE
---------------------------------------------------------- */
+/* HOSPEDERÍA + ALBERGUE */
 
 if(
 preference === 'combinado' &&
@@ -6752,9 +6925,7 @@ return;
 }
 
 
-/* ---------------------------------------------------------
-   VALORAR AMBAS OPCIONES
---------------------------------------------------------- */
+/* VALORAR AMBAS */
 
 if(
 preference === 'ambas' &&
@@ -6772,9 +6943,7 @@ return;
 }
 
 
-/* ---------------------------------------------------------
-   CONFIRMACIÓN FINAL
---------------------------------------------------------- */
+/* CONFIRMACIÓN FINAL */
 
 if(!summaryConfirmation.checked){
 
@@ -6783,10 +6952,7 @@ alert(
 );
 
 
-document.getElementById(
-'finalSummary'
-)
-.scrollIntoView({
+finalSummary.scrollIntoView({
 behavior:'smooth',
 block:'center'
 });
@@ -6797,9 +6963,7 @@ return;
 }
 
 
-/* ---------------------------------------------------------
-   PROTOTIPO
---------------------------------------------------------- */
+/* PROTOTIPO */
 
 const success =
 document.getElementById(
