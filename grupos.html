@@ -776,8 +776,8 @@ a partir de las 16:00 y check-out a las 11:00.
 <div class="need">
 <h3>Aparcamiento</h3>
 <p>
-Existe aparcamiento sujeto a disponibilidad;
-no se reservan plazas.
+El aparcamiento para coches está sujeto a disponibilidad
+y no admite reserva previa.
 </p>
 </div>
 
@@ -1268,13 +1268,13 @@ Picnic de desayuno
 <label class="choice">
 
 <input
-id="parkingCheckbox"
+id="busParkingCheckbox"
 type="checkbox"
-name="Solicita información aparcamiento"
+name="Solicita parking de autobús"
 value="Sí"
 >
 
-Información sobre aparcamiento/autobús
+Parking para autobús
 
 </label>
 
@@ -1557,7 +1557,7 @@ Los datos no se han enviado todavía.
 
 <p class="lead">
 Este formulario permite indicar alojamiento,
-restauración, desayunos picnic y salas.
+restauración, desayunos picnic, salas y parking para autobús.
 </p>
 
 <a
@@ -1652,8 +1652,8 @@ document.getElementById('arrivalDate');
 const departureInput =
 document.getElementById('departureDate');
 
-const parkingCheckbox =
-document.getElementById('parkingCheckbox');
+const busParkingCheckbox =
+document.getElementById('busParkingCheckbox');
 
 const summaryConfirmation =
 document.getElementById('summaryConfirmation');
@@ -2497,12 +2497,6 @@ return [];
 }
 
 
-/*
-Desayuno:
-día siguiente a llegada
-hasta salida incluida.
-*/
-
 return dates.slice(1);
 
 }
@@ -3260,8 +3254,6 @@ const isDeparture =
 index === dates.length-1;
 
 
-/* llegada: solo cena */
-
 if(
 !isArrival ||
 isDeparture
@@ -3279,8 +3271,6 @@ defaultPeople
 
 }
 
-
-/* salida: solo comida */
 
 if(
 !isDeparture ||
@@ -3311,7 +3301,7 @@ day
 
 
 /* =========================================================
-   DESAYUNO PICNIC PARCIAL
+   DESAYUNO PICNIC
 ========================================================= */
 
 const breakfastPicnicCheckbox =
@@ -4714,8 +4704,8 @@ Otros servicios
 <ul class="summary-list">
 
 <li>
-Información sobre aparcamiento/autobús:
-<strong>${parkingCheckbox.checked ? 'Sí' : 'No'}</strong>
+Parking para autobús:
+<strong>${busParkingCheckbox.checked ? 'Sí' : 'No'}</strong>
 </li>
 
 </ul>
@@ -4782,15 +4772,10 @@ ${escapeHtml(observations)}
 
 
 /* =========================================================
-   CAMBIOS DEL FORMULARIO
+   CAMBIOS FORMULARIO
 ========================================================= */
 
 function markSummaryAsChanged(event){
-
-/*
-No desmarcamos la confirmación
-cuando el propio usuario está marcándola.
-*/
 
 if(
 event &&
@@ -4810,11 +4795,6 @@ updateFinalSummary();
 
 }
 
-
-/*
-Delegación sobre todo el formulario.
-También captura inputs generados dinámicamente.
-*/
 
 groupForm.addEventListener(
 'input',
@@ -4971,11 +4951,6 @@ const form =
 event.currentTarget;
 
 
-/*
-Actualizamos una última vez el resumen
-antes de comprobar el envío.
-*/
-
 updateFinalSummary();
 
 
@@ -5047,10 +5022,6 @@ return;
 
 }
 
-
-/*
-Confirmación final obligatoria.
-*/
 
 if(!summaryConfirmation.checked){
 
