@@ -191,20 +191,30 @@
   border:1px solid #ead49d;
 }
 
-.bedroom-summary strong{
+.bedroom-summary > strong{
   display:block;
 }
 
+
+/* Resumen individual por tipo, todo en una misma línea */
+
 .inventory-summary{
   margin-top:10px;
-  font-size:.88rem;
+  font-size:.9rem;
   color:#666;
-  line-height:1.55;
+  line-height:1.6;
 }
 
 .inventory-summary div{
   display:block;
+  white-space:nowrap;
 }
+
+.inventory-summary strong{
+  display:inline;
+  color:#444;
+}
+
 
 .suggestion-choice{
   display:flex;
@@ -217,6 +227,124 @@
   background:#fff;
 }
 
+
+/* =========================================================
+   V1.9 — RESTAURACIÓN COMPACTA + PICNIC
+========================================================= */
+
+.meal-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  padding:7px 0;
+  border-top:1px solid #eee7e1;
+}
+
+.meal-row:first-of-type{
+  border-top:0;
+}
+
+.meal-choice{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:700;
+  min-width:90px;
+}
+
+.meal-controls{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.meal-people-inline label{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:.88rem;
+  color:#555;
+}
+
+.meal-people-input{
+  width:68px !important;
+  padding:8px !important;
+  text-align:center;
+}
+
+.meal-people-input:disabled{
+  opacity:.45;
+  background:#f3f1ef;
+}
+
+
+/* Toggle picnic */
+
+.picnic-control{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:.88rem;
+  color:#555;
+  user-select:none;
+}
+
+.picnic-switch{
+  position:relative;
+  display:inline-block;
+  width:38px;
+  height:22px;
+}
+
+.picnic-switch input{
+  opacity:0;
+  width:0;
+  height:0;
+}
+
+.picnic-slider{
+  position:absolute;
+  inset:0;
+  cursor:pointer;
+  background:#d5d0cb;
+  border-radius:999px;
+  transition:.2s;
+}
+
+.picnic-slider:before{
+  content:"";
+  position:absolute;
+  width:16px;
+  height:16px;
+  left:3px;
+  top:3px;
+  background:#fff;
+  border-radius:50%;
+  transition:.2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+
+.picnic-switch input:checked + .picnic-slider{
+  background:#9b1c31;
+}
+
+.picnic-switch input:checked + .picnic-slider:before{
+  transform:translateX(16px);
+}
+
+.picnic-switch input:disabled + .picnic-slider{
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 
 @media(min-width:700px){
 
@@ -239,6 +367,16 @@
     padding-left:26px;
   }
 
+  .meal-row{
+    align-items:flex-start;
+  }
+
+  .meal-controls{
+    width:100%;
+    justify-content:space-between;
+    padding-left:26px;
+  }
+
 }
 
 </style>
@@ -249,15 +387,10 @@
 <body>
 
 <div class="topbar">
-
-<div class="container">
-
-<span>Barcelona</span>
-
-<span>ES · CA · EN</span>
-
-</div>
-
+  <div class="container">
+    <span>Barcelona</span>
+    <span>ES · CA · EN</span>
+  </div>
 </div>
 
 
@@ -266,58 +399,22 @@
 <div class="container nav">
 
 <a class="logo" href="index.html">
-
 MARTÍ CODOLAR
-
-<small>
-OBRA SALESIANA
-</small>
-
+<small>OBRA SALESIANA</small>
 </a>
-
 
 <nav>
-
-<a href="alojamiento.html">
-Alojamiento
-</a>
-
-<a href="grupos.html">
-<strong>Grupos</strong>
-</a>
-
-<a href="salas.html">
-Salas y eventos
-</a>
-
-<a href="index.html#jardines">
-Jardines
-</a>
-
-<a href="index.html#historia">
-Martí Codolar
-</a>
-
-<a href="#solicitud">
-Contacto
-</a>
-
+<a href="alojamiento.html">Alojamiento</a>
+<a href="grupos.html"><strong>Grupos</strong></a>
+<a href="salas.html">Salas y eventos</a>
+<a href="index.html#jardines">Jardines</a>
+<a href="index.html#historia">Martí Codolar</a>
+<a href="#solicitud">Contacto</a>
 </nav>
 
-
 <div>
-
-<a
-class="btn secondary"
-href="#solicitud"
->
-Consultar
-</a>
-
-<button class="menu">
-☰
-</button>
-
+<a class="btn secondary" href="#solicitud">Consultar</a>
+<button class="menu">☰</button>
 </div>
 
 </div>
@@ -337,50 +434,25 @@ Consultar
 <div class="container">
 
 <div class="breadcrumbs">
-
-<a href="index.html">
-Inicio
-</a>
-
-/
-
-Grupos
-
+<a href="index.html">Inicio</a> / Grupos
 </div>
 
-
-<div
-class="eyebrow"
-style="color:#9b1c31"
->
+<div class="eyebrow" style="color:#9b1c31">
 Alojamiento para grupos
 </div>
 
-
 <h1 style="color:#252525">
-
 Organiza la estancia de tu grupo
-
 </h1>
 
-
 <p class="lead">
-
 Martí Codolar puede alojar grupos en Hospedería o Albergue,
 con condiciones y características diferentes.
-
 No necesitas saber de antemano cuál es la opción adecuada.
-
 </p>
 
-
-<a
-class="btn"
-href="#solicitud"
->
-
+<a class="btn" href="#solicitud">
 Solicitar disponibilidad y presupuesto
-
 </a>
 
 </div>
@@ -396,74 +468,38 @@ Solicitar disponibilidad y presupuesto
 
 <div class="container">
 
-<div
-class="eyebrow"
-style="color:#9b1c31"
->
+<div class="eyebrow" style="color:#9b1c31">
 Dos posibilidades
 </div>
 
-
 <h2>
-
 Hospedería o Albergue según las necesidades del grupo
-
 </h2>
 
-
 <p class="lead">
-
 La solicitud empieza por vuestro grupo, no por el edificio.
-
 Indicadnos fechas, número de personas y necesidades;
 reservas podrá valorar la opción adecuada.
-
 El Albergue solo es una posibilidad para grupos de
 45 personas o más.
-
 </p>
 
 
-<div
-class="cards"
-style="grid-template-columns:1fr 1fr"
->
-
+<div class="cards" style="grid-template-columns:1fr 1fr">
 
 <article class="group-option">
 
-<h3>
-Hospedería
-</h3>
+<h3>Hospedería</h3>
 
 <p>
-
 Habitaciones con baño privado.
-
 También puede utilizarse para reservas de grupos.
-
 </p>
 
-
 <ul class="checklist">
-
-<li>
-
-Habitaciones individuales, dobles y otras configuraciones
-según disponibilidad.
-
-</li>
-
-<li>
-Desayuno incluido en el alojamiento.
-</li>
-
-<li>
-
-Opción a valorar según las características del grupo.
-
-</li>
-
+<li>Habitaciones individuales, dobles y otras configuraciones según disponibilidad.</li>
+<li>Desayuno incluido en el alojamiento.</li>
+<li>Opción a valorar según las características del grupo.</li>
 </ul>
 
 </article>
@@ -471,42 +507,19 @@ Opción a valorar según las características del grupo.
 
 <article class="group-option">
 
-<h3>
-Albergue
-</h3>
+<h3>Albergue</h3>
 
 <p>
-
 Alojamiento destinado exclusivamente a grupos de
 <strong>45 personas o más</strong>,
 con habitaciones de literas y baños compartidos.
-
 </p>
 
-
 <ul class="checklist">
-
-<li>
-
-Solo puede ofrecerse a grupos de 45 personas o más.
-
-</li>
-
-<li>
-No admite reservas individuales.
-</li>
-
-<li>
-Desayuno incluido.
-</li>
-
-<li>
-
-Orientado a grupos que buscan una solución colectiva
-de alojamiento.
-
-</li>
-
+<li>Solo puede ofrecerse a grupos de 45 personas o más.</li>
+<li>No admite reservas individuales.</li>
+<li>Desayuno incluido.</li>
+<li>Orientado a grupos que buscan una solución colectiva de alojamiento.</li>
 </ul>
 
 </article>
@@ -514,16 +527,10 @@ de alojamiento.
 </div>
 
 
-<div
-class="notice"
-style="margin-top:22px"
->
+<div class="notice" style="margin-top:22px">
 
 <strong>
-
-No hace falta elegir entre Hospedería y Albergue
-si tienes dudas.
-
+No hace falta elegir entre Hospedería y Albergue si tienes dudas.
 </strong>
 
 <br>
@@ -546,93 +553,51 @@ Para grupos de 45 personas o más puedes seleccionar
 
 <div class="container">
 
-<div
-class="eyebrow"
-style="color:#9b1c31"
->
+<div class="eyebrow" style="color:#9b1c31">
 Más que alojamiento
 </div>
 
-
 <h2>
-
 Servicios que pueden formar parte de la estancia
-
 </h2>
 
-
 <p class="lead">
-
 Un grupo puede necesitar únicamente alojamiento
 o combinarlo con otros servicios.
-
 La solicitud debe recogerlo en un solo recorrido.
-
 </p>
 
 
 <div class="service-grid">
 
-
 <div class="need">
-
-<div class="icon">
-🍽️
-</div>
-
-<h3>
-Comidas y cenas
-</h3>
-
+<div class="icon">🍽️</div>
+<h3>Comidas y cenas</h3>
 <p>
-
 Indica si el grupo necesita restauración
 además del desayuno incluido.
-
 </p>
-
 </div>
 
 
 <div class="need">
-
-<div class="icon">
-🏛️
-</div>
-
-<h3>
-Salas
-</h3>
-
+<div class="icon">🏛️</div>
+<h3>Salas</h3>
 <p>
-
 Podéis solicitar espacios para reuniones,
 cursos, talleres o actividades.
-
 </p>
-
 </div>
 
 
 <div class="need">
-
-<div class="icon">
-🌿
-</div>
-
-<h3>
-Espacios exteriores
-</h3>
-
+<div class="icon">🌿</div>
+<h3>Espacios exteriores</h3>
 <p>
-
 La solicitud puede señalar interés
 en jardines o exteriores.
-
 </p>
-
 </div>
-
 
 </div>
 
@@ -649,69 +614,41 @@ en jardines o exteriores.
 
 <div class="container">
 
-<div
-class="eyebrow"
-style="color:#9b1c31"
->
+<div class="eyebrow" style="color:#9b1c31">
 Información práctica
 </div>
-
 
 <h2>
 Antes de enviar la solicitud
 </h2>
 
-
 <div class="info-grid">
 
-
 <div class="need">
-
-<h3>
-¿Cuándo se considera grupo?
-</h3>
-
+<h3>¿Cuándo se considera grupo?</h3>
 <p>
-
 La información actualmente publicada por Martí Codolar
 considera grupo una reserva a partir de 15 personas.
-
 </p>
-
 </div>
 
 
 <div class="need">
-
-<h3>
-Entrada y salida
-</h3>
-
+<h3>Entrada y salida</h3>
 <p>
-
 La información actual indica check-in
 a partir de las 16:00 y check-out a las 11:00.
-
 </p>
-
 </div>
 
 
 <div class="need">
-
-<h3>
-Aparcamiento
-</h3>
-
+<h3>Aparcamiento</h3>
 <p>
-
 Existe aparcamiento sujeto a disponibilidad;
 no se reservan plazas.
-
 </p>
-
 </div>
-
 
 </div>
 
@@ -733,28 +670,21 @@ class="soft"
 
 <div class="form-panel">
 
-
 <div
 class="eyebrow"
 style="color:#9b1c31"
 >
-
 Solicitud para grupos
-
 </div>
-
 
 <h2>
 Cuéntanos qué necesitáis
 </h2>
 
-
 <p class="lead">
-
 El formulario está pensado para que reservas reciba
 una solicitud suficientemente completa
 sin obligarte a enviar consultas separadas.
-
 </p>
 
 
@@ -818,12 +748,9 @@ required
 >
 
 <small>
-
 Se considera grupo a partir de 15 personas.
-
 El Albergue solo está disponible para grupos
 de 45 personas o más.
-
 </small>
 
 </div>
@@ -849,7 +776,7 @@ required
 
 
 <!-- ======================================================
-     PREFERENCIA DE ALOJAMIENTO
+     PREFERENCIA ALOJAMIENTO
 ======================================================= -->
 
 <div
@@ -868,16 +795,13 @@ name="Preferencia de alojamiento"
 required
 >
 
-
 <option value="">
 Selecciona una opción
 </option>
 
-
 <option value="hospederia">
 Hospedería
 </option>
-
 
 <option
 id="albergueOption"
@@ -886,7 +810,6 @@ value="albergue"
 Albergue
 </option>
 
-
 <option
 id="ambasOption"
 value="ambas"
@@ -894,15 +817,12 @@ value="ambas"
 Quiero valorar ambas opciones
 </option>
 
-
 </select>
 
 
 <small id="lodgingHelp">
-
 Indica primero el número total de personas
 para mostrar las opciones disponibles.
-
 </small>
 
 </div>
@@ -918,21 +838,14 @@ class="conditional-subform"
 hidden
 >
 
-
 <h3 style="margin-top:0">
-
 Distribución de habitaciones en Hospedería
-
 </h3>
 
-
 <p class="form-note">
-
 Indica una distribución orientativa.
-
 El sistema controla simultáneamente el número de personas
 y el inventario disponible.
-
 </p>
 
 
@@ -955,9 +868,7 @@ class="bedroom-type-checkbox"
 data-type="individual"
 >
 
-<span>
-Individuales
-</span>
+<span>Individuales</span>
 
 </label>
 
@@ -983,9 +894,7 @@ disabled
 class="bedroom-people"
 data-people="individual"
 >
-
 0 personas
-
 </div>
 
 </div>
@@ -1007,9 +916,7 @@ class="bedroom-type-checkbox"
 data-type="doble"
 >
 
-<span>
-Dobles
-</span>
+<span>Dobles</span>
 
 </label>
 
@@ -1035,9 +942,7 @@ disabled
 class="bedroom-people"
 data-people="doble"
 >
-
 0 personas
-
 </div>
 
 </div>
@@ -1059,9 +964,7 @@ class="bedroom-type-checkbox"
 data-type="triple"
 >
 
-<span>
-Triples
-</span>
+<span>Triples</span>
 
 </label>
 
@@ -1087,9 +990,7 @@ disabled
 class="bedroom-people"
 data-people="triple"
 >
-
 0 personas
-
 </div>
 
 </div>
@@ -1111,9 +1012,7 @@ class="bedroom-type-checkbox"
 data-type="cuadruple"
 >
 
-<span>
-Cuádruples
-</span>
+<span>Cuádruples</span>
 
 </label>
 
@@ -1139,9 +1038,7 @@ disabled
 class="bedroom-people"
 data-people="cuadruple"
 >
-
 0 personas
-
 </div>
 
 </div>
@@ -1175,22 +1072,17 @@ name="Solicita propuesta de distribución"
 value="Sí"
 >
 
-
 <span>
 
 <strong>
-
 Quiero que Martí Codolar me proponga una distribución
-
 </strong>
 
 <br>
 
 <small>
-
 Puedes seguir indicando preferencias parciales
 y dejar que reservas proponga el resto.
-
 </small>
 
 </span>
@@ -1202,7 +1094,7 @@ y dejar que reservas proponga el resto.
 
 
 <!-- ======================================================
-     NECESIDADES DE ALOJAMIENTO
+     NECESIDADES ALOJAMIENTO
 ======================================================= -->
 
 <div style="margin-top:28px">
@@ -1210,7 +1102,6 @@ y dejar que reservas proponga el resto.
 <h3>
 Necesidades de alojamiento
 </h3>
-
 
 <div class="field">
 
@@ -1311,27 +1202,18 @@ class="conditional-subform"
 hidden
 >
 
-
 <h3 style="margin-top:0">
-
 Comidas y cenas durante la estancia
-
 </h3>
 
-
 <p class="form-note">
-
 Indica qué servicios necesita el grupo cada día
 y para cuántas personas.
-
-El número de personas puede ser diferente
-en cada comida o cena.
-
+Puedes indicar si cada servicio debe prepararse
+en formato picnic.
 </p>
 
-
 <div id="mealsDays"></div>
-
 
 </div>
 
@@ -1346,26 +1228,17 @@ class="conditional-subform"
 hidden
 >
 
-
 <h3 style="margin-top:0">
-
 Salas durante la estancia
-
 </h3>
 
-
 <p class="form-note">
-
 Marca los días en los que el grupo necesita una sala.
-
 Puedes solicitar varias salas el mismo día
 y especificar un número diferente de asistentes para cada una.
-
 </p>
 
-
 <div id="roomDays"></div>
-
 
 </div>
 
@@ -1388,9 +1261,7 @@ Datos del solicitante
 
 <div class="field">
 
-<label>
-Nombre
-</label>
+<label>Nombre</label>
 
 <input
 type="text"
@@ -1403,9 +1274,7 @@ required
 
 <div class="field">
 
-<label>
-Apellido 1
-</label>
+<label>Apellido 1</label>
 
 <input
 type="text"
@@ -1418,9 +1287,7 @@ required
 
 <div class="field">
 
-<label>
-Apellido 2
-</label>
+<label>Apellido 2</label>
 
 <input
 type="text"
@@ -1507,7 +1374,6 @@ value="Sí"
 required
 >
 
-
 <span>
 
 Acepto la política de privacidad.
@@ -1571,7 +1437,6 @@ Formulario comprobado correctamente.
 <p style="margin-bottom:0">
 
 Esta es una simulación del prototipo.
-
 Los datos no se han enviado todavía.
 
 </p>
@@ -1599,10 +1464,8 @@ Los datos no se han enviado todavía.
 </h2>
 
 <p class="lead">
-
 Este formulario permite indicar alojamiento,
 restauración, salas y exteriores.
-
 </p>
 
 <a
@@ -1610,9 +1473,7 @@ class="btn"
 style="background:#fff;color:#9b1c31;border-color:#fff"
 href="index.html#necesidad"
 >
-
 Volver a la Home
-
 </a>
 
 </div>
@@ -1628,59 +1489,28 @@ Volver a la Home
 <div class="container footer-grid">
 
 <div>
-
-<strong>
-MARTÍ CODOLAR
-</strong>
-
-<p>
-Prototipo V1.9 · Página de grupos integrada.
-</p>
-
+<strong>MARTÍ CODOLAR</strong>
+<p>Prototipo V1.9 · Página de grupos integrada.</p>
 </div>
 
-
 <div>
-
-<strong>
-Explorar
-</strong>
+<strong>Explorar</strong>
 
 <p>
-
-<a href="alojamiento.html">
-Alojamiento
-</a>
-
+<a href="alojamiento.html">Alojamiento</a>
 <br>
-
-<a href="grupos.html">
-Grupos
-</a>
-
+<a href="grupos.html">Grupos</a>
 <br>
-
-<a href="salas.html">
-Salas y eventos
-</a>
-
+<a href="salas.html">Salas y eventos</a>
 <br>
-
 Jardines
-
 </p>
 
 </div>
 
-
 <div>
-
-<strong>
-Información
-</strong>
-
+<strong>Información</strong>
 <p>
-
 FAQ
 <br>
 Cómo llegar
@@ -1688,11 +1518,8 @@ Cómo llegar
 Contacto
 <br>
 Privacidad
-
 </p>
-
 </div>
-
 
 </div>
 
@@ -1700,9 +1527,7 @@ Privacidad
 
 
 <div class="prototype">
-
 GRUPOS · PROTOTIPO V1.9
-
 </div>
 
 
@@ -1736,12 +1561,64 @@ document.getElementById('departureDate');
 
 
 /* =========================================================
+   FECHAS — CHECK-OUT NO PUEDE SER ANTERIOR AL CHECK-IN
+========================================================= */
+
+function updateDepartureMinimum(){
+
+const arrival =
+arrivalInput.value;
+
+
+if(!arrival){
+
+departureInput.removeAttribute(
+'min'
+);
+
+return;
+
+}
+
+
+/* El propio calendario impide seleccionar fechas anteriores */
+
+departureInput.min =
+arrival;
+
+
+/*
+Si ya existía una salida anterior a la nueva llegada,
+la eliminamos para evitar datos incoherentes.
+*/
+
+if(
+departureInput.value &&
+departureInput.value < arrival
+){
+
+departureInput.value = '';
+
+}
+
+
+/*
+Si están activos los bloques dinámicos,
+se regenerarán posteriormente desde el evento change.
+*/
+
+}
+
+
+/* =========================================================
    INVENTARIO HOSPEDERÍA
 ========================================================= */
 
-const STANDARD_ROOM_INVENTORY = 50;
+const STANDARD_ROOM_INVENTORY =
+50;
 
-const LARGE_ROOM_INVENTORY = 4;
+const LARGE_ROOM_INVENTORY =
+4;
 
 
 /* =========================================================
@@ -1860,28 +1737,8 @@ item.capacity
 }
 
 
-function calculatePoolUsage(pool){
-
-return getBedroomData()
-.filter(
-item =>
-item.pool === pool
-)
-.reduce(
-(total,item) => {
-
-return total +
-getSelectedQty(item);
-
-},
-0
-);
-
-}
-
-
 /* =========================================================
-   CONTADORES POR TIPO
+   CONTADORES INDIVIDUALES
 ========================================================= */
 
 function getBedroomQuantity(type){
@@ -2130,7 +1987,7 @@ ${getBedroomTypeSummary()}
 
 
 /* =========================================================
-   CONTROL DE INVENTARIO + PERSONAS
+   CONTROL INVENTARIO + PERSONAS
 ========================================================= */
 
 function updateBedroomState(){
@@ -2609,7 +2466,7 @@ date.getDate()
 
 
 /* =========================================================
-   RESTAURACIÓN
+   RESTAURACIÓN + PICNIC
 ========================================================= */
 
 const mealsCheckbox =
@@ -2666,12 +2523,13 @@ value="Sí"
 >
 
 <span class="meal-label">
-
 ${label}
-
 </span>
 
 </label>
+
+
+<div class="meal-controls">
 
 
 <div class="meal-people-inline">
@@ -2694,6 +2552,32 @@ disabled
 
 </div>
 
+
+<label class="picnic-control">
+
+<span>
+Picnic
+</span>
+
+<span class="picnic-switch">
+
+<input
+type="checkbox"
+class="picnic-checkbox"
+name="Picnic ${label} ${dateKey}"
+value="Sí"
+disabled
+>
+
+<span class="picnic-slider"></span>
+
+</span>
+
+</label>
+
+
+</div>
+
 `;
 
 
@@ -2709,6 +2593,12 @@ row.querySelector(
 );
 
 
+const picnicCheckbox =
+row.querySelector(
+'.picnic-checkbox'
+);
+
+
 checkbox.addEventListener(
 'change',
 () => {
@@ -2720,6 +2610,23 @@ peopleInput.disabled =
 
 peopleInput.required =
 checkbox.checked;
+
+
+picnicCheckbox.disabled =
+!checkbox.checked;
+
+
+/*
+Si se desmarca Comida/Cena,
+el picnic también se desmarca.
+*/
+
+if(!checkbox.checked){
+
+picnicCheckbox.checked =
+false;
+
+}
 
 
 if(
@@ -2745,19 +2652,22 @@ return row;
 
 function generateMealsDays(){
 
-mealsDays.innerHTML = '';
+mealsDays.innerHTML =
+'';
 
 
 if(!mealsCheckbox.checked){
 
-mealsSection.hidden = true;
+mealsSection.hidden =
+true;
 
 return;
 
 }
 
 
-mealsSection.hidden = false;
+mealsSection.hidden =
+false;
 
 
 const dates =
@@ -2826,6 +2736,11 @@ const isDeparture =
 index === dates.length-1;
 
 
+/*
+Llegada:
+solo Cena
+*/
+
 if(
 !isArrival ||
 isDeparture
@@ -2843,6 +2758,11 @@ defaultPeople
 
 }
 
+
+/*
+Salida:
+solo Comida
+*/
 
 if(
 !isDeparture ||
@@ -2949,11 +2869,14 @@ attendees,
 previousValue=''
 ){
 
-select.innerHTML = '';
+select.innerHTML =
+'';
 
 
 const recommendation =
-document.createElement('option');
+document.createElement(
+'option'
+);
 
 
 recommendation.value =
@@ -2986,7 +2909,9 @@ room => {
 
 
 const option =
-document.createElement('option');
+document.createElement(
+'option'
+);
 
 
 option.value =
@@ -3031,7 +2956,9 @@ defaultPeople
 ){
 
 const row =
-document.createElement('div');
+document.createElement(
+'div'
+);
 
 
 row.className =
@@ -3070,9 +2997,7 @@ name="Sala ${roomNumber} ${dateKey}"
 >
 
 <option value="">
-
 Quiero que me recomendéis una sala
-
 </option>
 
 </select>
@@ -3171,11 +3096,15 @@ defaultPeople
 ){
 
 const dateKey =
-getDateKey(date);
+getDateKey(
+date
+);
 
 
 const day =
-document.createElement('div');
+document.createElement(
+'div'
+);
 
 
 day.className =
@@ -3183,15 +3112,21 @@ day.className =
 
 
 const title =
-document.createElement('h4');
+document.createElement(
+'h4'
+);
 
 
 title.textContent =
-formatDate(date);
+formatDate(
+date
+);
 
 
 const toggleLabel =
-document.createElement('label');
+document.createElement(
+'label'
+);
 
 
 toggleLabel.className =
@@ -3199,7 +3134,9 @@ toggleLabel.className =
 
 
 const toggle =
-document.createElement('input');
+document.createElement(
+'input'
+);
 
 
 toggle.type =
@@ -3215,7 +3152,9 @@ toggle.value =
 
 
 const toggleText =
-document.createElement('span');
+document.createElement(
+'span'
+);
 
 
 toggleText.textContent =
@@ -3233,7 +3172,9 @@ toggleText
 
 
 const content =
-document.createElement('div');
+document.createElement(
+'div'
+);
 
 
 content.className =
@@ -3245,7 +3186,9 @@ true;
 
 
 const requests =
-document.createElement('div');
+document.createElement(
+'div'
+);
 
 
 requests.className =
@@ -3253,7 +3196,9 @@ requests.className =
 
 
 const addButton =
-document.createElement('button');
+document.createElement(
+'button'
+);
 
 
 addButton.type =
@@ -3269,7 +3214,9 @@ addButton.textContent =
 
 
 const help =
-document.createElement('div');
+document.createElement(
+'div'
+);
 
 
 help.className =
@@ -3479,9 +3426,14 @@ generateRoomDays();
 );
 
 
+/* CHECK-IN */
+
 arrivalInput.addEventListener(
 'change',
 () => {
+
+
+updateDepartureMinimum();
 
 
 if(mealsCheckbox.checked){
@@ -3501,6 +3453,8 @@ generateRoomDays();
 
 );
 
+
+/* CHECK-OUT */
 
 departureInput.addEventListener(
 'change',
@@ -3541,6 +3495,8 @@ generateRoomDays
    INICIALIZACIÓN
 ========================================================= */
 
+updateDepartureMinimum();
+
 updateLodgingOptions();
 
 updateBedroomState();
@@ -3562,6 +3518,28 @@ event.currentTarget;
 if(!form.checkValidity()){
 
 form.reportValidity();
+
+return;
+
+}
+
+
+/*
+Validación adicional de fechas,
+aunque el calendario ya lo impide.
+*/
+
+if(
+arrivalInput.value &&
+departureInput.value &&
+departureInput.value < arrivalInput.value
+){
+
+alert(
+'La fecha de salida no puede ser anterior a la fecha de llegada.'
+);
+
+departureInput.focus();
 
 return;
 
