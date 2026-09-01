@@ -195,9 +195,6 @@
   display:block;
 }
 
-
-/* Resumen individual por tipo, todo en una misma línea */
-
 .inventory-summary{
   margin-top:10px;
   font-size:.9rem;
@@ -215,7 +212,6 @@
   color:#444;
 }
 
-
 .suggestion-choice{
   display:flex;
   align-items:flex-start;
@@ -229,60 +225,98 @@
 
 
 /* =========================================================
-   V1.9 — RESTAURACIÓN COMPACTA + PICNIC
+   V1.9 — RESTAURACIÓN
 ========================================================= */
 
-.meal-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  padding:7px 0;
+.meal-service-block{
+  padding:8px 0;
   border-top:1px solid #eee7e1;
 }
 
-.meal-row:first-of-type{
+.meal-service-block:first-of-type{
   border-top:0;
 }
 
-.meal-choice{
+.meal-service-header{
   display:flex;
   align-items:center;
   gap:8px;
   font-weight:700;
-  min-width:90px;
+  margin-bottom:7px;
 }
 
-.meal-controls{
+.meal-lines{
+  display:grid;
+  gap:6px;
+  padding-left:26px;
+}
+
+.meal-line{
   display:flex;
   align-items:center;
-  justify-content:flex-end;
-  gap:14px;
+  gap:12px;
   flex-wrap:wrap;
+  padding:5px 0;
 }
 
-.meal-people-inline label{
+.meal-line-label{
+  min-width:76px;
+  font-size:.84rem;
+  color:#666;
+}
+
+.meal-person-control{
   display:flex;
   align-items:center;
-  gap:7px;
+  gap:6px;
   font-size:.88rem;
   color:#555;
 }
 
-.meal-people-input{
+.meal-person-input{
   width:68px !important;
   padding:8px !important;
   text-align:center;
 }
 
-.meal-people-input:disabled{
-  opacity:.45;
-  background:#f3f1ef;
+.meal-line-remove{
+  border:0;
+  background:transparent;
+  color:#9b1c31;
+  font-weight:700;
+  cursor:pointer;
+  padding:4px 0;
+}
+
+.meal-warning{
+  margin:9px 0 0 26px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#fff8e7;
+  border:1px solid #ead49d;
+  font-size:.88rem;
+}
+
+.meal-warning-actions{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+
+.meal-warning button{
+  border:1px solid #9b1c31;
+  background:#fff;
+  color:#9b1c31;
+  border-radius:999px;
+  padding:6px 12px;
+  font-weight:700;
+  cursor:pointer;
 }
 
 
-/* Toggle picnic */
+/* =========================================================
+   TOGGLE PICNIC
+========================================================= */
 
 .picnic-control{
   display:flex;
@@ -343,6 +377,34 @@
 
 
 /* =========================================================
+   DESAYUNOS PICNIC
+========================================================= */
+
+.breakfast-day{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:10px 0;
+  border-top:1px solid #eee7e1;
+}
+
+.breakfast-day:first-child{
+  border-top:0;
+}
+
+.breakfast-day-date{
+  font-weight:700;
+}
+
+.breakfast-day small{
+  display:block;
+  color:#666;
+  font-weight:400;
+}
+
+
+/* =========================================================
    RESPONSIVE
 ========================================================= */
 
@@ -353,7 +415,6 @@
   }
 
 }
-
 
 @media(max-width:520px){
 
@@ -367,14 +428,12 @@
     padding-left:26px;
   }
 
-  .meal-row{
-    align-items:flex-start;
+  .meal-line{
+    gap:8px;
   }
 
-  .meal-controls{
-    width:100%;
-    justify-content:space-between;
-    padding-left:26px;
+  .breakfast-day{
+    align-items:flex-start;
   }
 
 }
@@ -382,7 +441,6 @@
 </style>
 
 </head>
-
 
 <body>
 
@@ -425,10 +483,6 @@ MARTÍ CODOLAR
 <main>
 
 
-<!-- ======================================================
-     HERO
-======================================================= -->
-
 <section class="page-hero">
 
 <div class="container">
@@ -459,10 +513,6 @@ Solicitar disponibilidad y presupuesto
 
 </section>
 
-
-<!-- ======================================================
-     HOSPEDERÍA / ALBERGUE
-======================================================= -->
 
 <section>
 
@@ -545,10 +595,6 @@ Para grupos de 45 personas o más puedes seleccionar
 </section>
 
 
-<!-- ======================================================
-     SERVICIOS
-======================================================= -->
-
 <section class="soft">
 
 <div class="container">
@@ -591,11 +637,11 @@ cursos, talleres o actividades.
 
 
 <div class="need">
-<div class="icon">🌿</div>
-<h3>Espacios exteriores</h3>
+<div class="icon">🥐</div>
+<h3>Desayuno picnic</h3>
 <p>
-La solicitud puede señalar interés
-en jardines o exteriores.
+El desayuno está incluido. Podéis indicar
+qué días necesitáis recibirlo en formato picnic.
 </p>
 </div>
 
@@ -605,10 +651,6 @@ en jardines o exteriores.
 
 </section>
 
-
-<!-- ======================================================
-     INFORMACIÓN PRÁCTICA
-======================================================= -->
 
 <section>
 
@@ -657,23 +699,13 @@ no se reservan plazas.
 </section>
 
 
-<!-- ======================================================
-     FORMULARIO
-======================================================= -->
-
-<section
-id="solicitud"
-class="soft"
->
+<section id="solicitud" class="soft">
 
 <div class="container form-wrap">
 
 <div class="form-panel">
 
-<div
-class="eyebrow"
-style="color:#9b1c31"
->
+<div class="eyebrow" style="color:#9b1c31">
 Solicitud para grupos
 </div>
 
@@ -694,18 +726,12 @@ onsubmit="submitGroup(event)"
 >
 
 
-<!-- ======================================================
-     DATOS PRINCIPALES
-======================================================= -->
-
 <div class="form-grid two">
 
 
 <div class="field">
 
-<label>
-Fecha de llegada
-</label>
+<label>Fecha de llegada</label>
 
 <input
 id="arrivalDate"
@@ -719,9 +745,7 @@ required
 
 <div class="field">
 
-<label>
-Fecha de salida
-</label>
+<label>Fecha de salida</label>
 
 <input
 id="departureDate"
@@ -735,9 +759,7 @@ required
 
 <div class="field">
 
-<label>
-Número total de personas
-</label>
+<label>Número total de personas</label>
 
 <input
 id="groupSize"
@@ -758,9 +780,7 @@ de 45 personas o más.
 
 <div class="field">
 
-<label>
-Tipo de grupo / entidad
-</label>
+<label>Tipo de grupo / entidad</label>
 
 <input
 type="text"
@@ -775,19 +795,11 @@ required
 </div>
 
 
-<!-- ======================================================
-     PREFERENCIA ALOJAMIENTO
-======================================================= -->
-
-<div
-class="field"
-style="margin-top:20px"
->
+<div class="field" style="margin-top:20px">
 
 <label>
 Preferencia de alojamiento
 </label>
-
 
 <select
 id="lodgingPreference"
@@ -828,9 +840,7 @@ para mostrar las opciones disponibles.
 </div>
 
 
-<!-- ======================================================
-     DISTRIBUCIÓN HOSPEDERÍA
-======================================================= -->
+<!-- DISTRIBUCIÓN HOSPEDERÍA -->
 
 <div
 id="bedroomDistributionSection"
@@ -851,8 +861,6 @@ y el inventario disponible.
 
 <div class="bedroom-distribution-grid">
 
-
-<!-- INDIVIDUALES -->
 
 <div
 class="bedroom-row"
@@ -900,8 +908,6 @@ data-people="individual"
 </div>
 
 
-<!-- DOBLES -->
-
 <div
 class="bedroom-row"
 data-capacity="2"
@@ -948,8 +954,6 @@ data-people="doble"
 </div>
 
 
-<!-- TRIPLES -->
-
 <div
 class="bedroom-row"
 data-capacity="3"
@@ -995,8 +999,6 @@ data-people="triple"
 
 </div>
 
-
-<!-- CUÁDRUPLES -->
 
 <div
 class="bedroom-row"
@@ -1089,13 +1091,8 @@ y dejar que reservas proponga el resto.
 
 </label>
 
-
 </div>
 
-
-<!-- ======================================================
-     NECESIDADES ALOJAMIENTO
-======================================================= -->
 
 <div style="margin-top:28px">
 
@@ -1119,9 +1116,7 @@ placeholder="Ej. responsables en habitaciones separadas, necesidades de accesibi
 </div>
 
 
-<!-- ======================================================
-     SERVICIOS ADICIONALES
-======================================================= -->
+<!-- SERVICIOS -->
 
 <div style="margin-top:28px">
 
@@ -1164,12 +1159,13 @@ Sala para actividades
 <label class="choice">
 
 <input
+id="breakfastPicnicCheckbox"
 type="checkbox"
-name="Solicita exteriores"
+name="Configura desayuno picnic"
 value="Sí"
 >
 
-Espacios exteriores / jardines
+Picnic de desayuno
 
 </label>
 
@@ -1192,9 +1188,7 @@ Información sobre aparcamiento/autobús
 </div>
 
 
-<!-- ======================================================
-     RESTAURACIÓN
-======================================================= -->
+<!-- RESTAURACIÓN -->
 
 <div
 id="mealsSection"
@@ -1207,10 +1201,10 @@ Comidas y cenas durante la estancia
 </h3>
 
 <p class="form-note">
-Indica qué servicios necesita el grupo cada día
-y para cuántas personas.
-Puedes indicar si cada servicio debe prepararse
-en formato picnic.
+Indica qué servicios necesita el grupo cada día.
+Puedes dividir un mismo servicio en varias líneas,
+por ejemplo una parte del grupo en comedor
+y otra parte con picnic.
 </p>
 
 <div id="mealsDays"></div>
@@ -1218,9 +1212,31 @@ en formato picnic.
 </div>
 
 
-<!-- ======================================================
-     SALAS
-======================================================= -->
+<!-- DESAYUNO PICNIC -->
+
+<div
+id="breakfastPicnicSection"
+class="conditional-subform"
+hidden
+>
+
+<h3 style="margin-top:0">
+Desayunos durante la estancia
+</h3>
+
+<p class="form-note">
+El desayuno está incluido en el alojamiento.
+Selecciona Picnic únicamente en las fechas
+en las que deseas sustituir el desayuno habitual
+por desayuno en formato picnic.
+</p>
+
+<div id="breakfastDays"></div>
+
+</div>
+
+
+<!-- SALAS -->
 
 <div
 id="roomsSection"
@@ -1243,9 +1259,7 @@ y especificar un número diferente de asistentes para cada una.
 </div>
 
 
-<!-- ======================================================
-     DATOS SOLICITANTE
-======================================================= -->
+<!-- SOLICITANTE -->
 
 <div style="margin-top:30px">
 
@@ -1258,101 +1272,42 @@ Datos del solicitante
 
 <div class="form-grid two">
 
-
 <div class="field">
-
 <label>Nombre</label>
-
-<input
-type="text"
-name="Nombre"
-required
->
-
+<input type="text" name="Nombre" required>
 </div>
 
-
 <div class="field">
-
 <label>Apellido 1</label>
-
-<input
-type="text"
-name="Apellido 1"
-required
->
-
+<input type="text" name="Apellido 1" required>
 </div>
 
-
 <div class="field">
-
 <label>Apellido 2</label>
-
-<input
-type="text"
-name="Apellido 2"
-required
->
-
+<input type="text" name="Apellido 2" required>
 </div>
-
 
 <div class="field">
-
-<label>
-Entidad / organización
-</label>
-
-<input
-type="text"
-name="Entidad / organización"
->
-
+<label>Entidad / organización</label>
+<input type="text" name="Entidad / organización">
 </div>
-
 
 <div class="field">
-
-<label>
-Correo electrónico
-</label>
-
-<input
-type="email"
-name="email"
-required
->
-
+<label>Correo electrónico</label>
+<input type="email" name="email" required>
 </div>
-
 
 <div class="field">
-
-<label>
-Teléfono
-</label>
-
-<input
-type="tel"
-name="Teléfono"
-required
->
+<label>Teléfono</label>
+<input type="tel" name="Teléfono" required>
+</div>
 
 </div>
 
 
-</div>
+<div class="field" style="margin-top:18px">
 
-
-<div
-class="field"
-style="margin-top:18px"
->
-
-<label>
-Observaciones
-</label>
+<label>Observaciones</label>
 
 <textarea
 name="Observaciones"
@@ -1362,10 +1317,7 @@ placeholder="Añade cualquier información relevante para preparar la propuesta.
 </div>
 
 
-<label
-class="consent"
-style="margin-top:18px"
->
+<label class="consent" style="margin-top:18px">
 
 <input
 type="checkbox"
@@ -1375,31 +1327,20 @@ required
 >
 
 <span>
-
 Acepto la política de privacidad.
-
-<small>
-(Texto legal provisional para el prototipo.)
-</small>
-
+<small>(Texto legal provisional para el prototipo.)</small>
 </span>
 
 </label>
 
 
-<div
-class="notice"
-style="margin-top:20px"
->
+<div class="notice" style="margin-top:20px">
 
-<strong>
-Modo prototipo.
-</strong>
+<strong>Modo prototipo.</strong>
 
 <br>
 
 La web está publicada actualmente mediante GitHub Pages.
-
 Este formulario permite probar toda la experiencia,
 pero todavía no envía la solicitud al departamento de reservas.
 
@@ -1408,13 +1349,8 @@ pero todavía no envía la solicitud al departamento de reservas.
 
 <div style="margin-top:20px">
 
-<button
-class="btn"
-type="submit"
->
-
+<button class="btn" type="submit">
 Probar solicitud de grupo
-
 </button>
 
 </div>
@@ -1435,25 +1371,18 @@ Formulario comprobado correctamente.
 </strong>
 
 <p style="margin-bottom:0">
-
 Esta es una simulación del prototipo.
 Los datos no se han enviado todavía.
-
 </p>
 
 </div>
 
 
 </div>
-
 </div>
 
 </section>
 
-
-<!-- ======================================================
-     CTA FINAL
-======================================================= -->
 
 <section class="band">
 
@@ -1465,7 +1394,7 @@ Los datos no se han enviado todavía.
 
 <p class="lead">
 Este formulario permite indicar alojamiento,
-restauración, salas y exteriores.
+restauración, desayunos picnic y salas.
 </p>
 
 <a
@@ -1495,28 +1424,20 @@ Volver a la Home
 
 <div>
 <strong>Explorar</strong>
-
 <p>
-<a href="alojamiento.html">Alojamiento</a>
-<br>
-<a href="grupos.html">Grupos</a>
-<br>
-<a href="salas.html">Salas y eventos</a>
-<br>
+<a href="alojamiento.html">Alojamiento</a><br>
+<a href="grupos.html">Grupos</a><br>
+<a href="salas.html">Salas y eventos</a><br>
 Jardines
 </p>
-
 </div>
 
 <div>
 <strong>Información</strong>
 <p>
-FAQ
-<br>
-Cómo llegar
-<br>
-Contacto
-<br>
+FAQ<br>
+Cómo llegar<br>
+Contacto<br>
 Privacidad
 </p>
 </div>
@@ -1561,7 +1482,7 @@ document.getElementById('departureDate');
 
 
 /* =========================================================
-   FECHAS — CHECK-OUT NO PUEDE SER ANTERIOR AL CHECK-IN
+   FECHA SALIDA MÍNIMA
 ========================================================= */
 
 function updateDepartureMinimum(){
@@ -1572,25 +1493,16 @@ arrivalInput.value;
 
 if(!arrival){
 
-departureInput.removeAttribute(
-'min'
-);
+departureInput.removeAttribute('min');
 
 return;
 
 }
 
 
-/* El propio calendario impide seleccionar fechas anteriores */
-
 departureInput.min =
 arrival;
 
-
-/*
-Si ya existía una salida anterior a la nueva llegada,
-la eliminamos para evitar datos incoherentes.
-*/
 
 if(
 departureInput.value &&
@@ -1601,12 +1513,6 @@ departureInput.value = '';
 
 }
 
-
-/*
-Si están activos los bloques dinámicos,
-se regenerarán posteriormente desde el evento change.
-*/
-
 }
 
 
@@ -1614,15 +1520,13 @@ se regenerarán posteriormente desde el evento change.
    INVENTARIO HOSPEDERÍA
 ========================================================= */
 
-const STANDARD_ROOM_INVENTORY =
-50;
+const STANDARD_ROOM_INVENTORY = 50;
 
-const LARGE_ROOM_INVENTORY =
-4;
+const LARGE_ROOM_INVENTORY = 4;
 
 
 /* =========================================================
-   DISTRIBUCIÓN DE HABITACIONES
+   HABITACIONES
 ========================================================= */
 
 const bedroomDistributionSection =
@@ -1737,10 +1641,6 @@ item.capacity
 }
 
 
-/* =========================================================
-   CONTADORES INDIVIDUALES
-========================================================= */
-
 function getBedroomQuantity(type){
 
 const item =
@@ -1750,14 +1650,9 @@ room.type === type
 );
 
 
-if(!item){
-
-return 0;
-
-}
-
-
-return getSelectedQty(item);
+return item
+? getSelectedQty(item)
+: 0;
 
 }
 
@@ -1770,10 +1665,6 @@ return quantity === 1
 
 }
 
-
-/* =========================================================
-   RESUMEN HABITACIONES
-========================================================= */
 
 function updateBedroomPeopleLabels(){
 
@@ -1805,24 +1696,16 @@ label.textContent =
 function getBedroomTypeSummary(){
 
 const individuales =
-getBedroomQuantity(
-'individual'
-);
+getBedroomQuantity('individual');
 
 const dobles =
-getBedroomQuantity(
-'doble'
-);
+getBedroomQuantity('doble');
 
 const triples =
-getBedroomQuantity(
-'triple'
-);
+getBedroomQuantity('triple');
 
 const cuadruples =
-getBedroomQuantity(
-'cuadruple'
-);
+getBedroomQuantity('cuadruple');
 
 
 return `
@@ -1945,12 +1828,9 @@ ${assigned} de ${totalPeople}
 </strong>
 
 <span>
-
 Quedan ${remaining} personas por distribuir.
-
 Martí Codolar podrá proponer una distribución
 para las plazas restantes.
-
 </span>
 
 ${getBedroomTypeSummary()}
@@ -1969,12 +1849,9 @@ ${assigned} de ${totalPeople}
 </strong>
 
 <span>
-
 Quedan ${remaining} personas por distribuir.
-
 Completa la distribución o marca
 “Quiero que Martí Codolar me proponga una distribución”.
-
 </span>
 
 ${getBedroomTypeSummary()}
@@ -1985,10 +1862,6 @@ ${getBedroomTypeSummary()}
 
 }
 
-
-/* =========================================================
-   CONTROL INVENTARIO + PERSONAS
-========================================================= */
 
 function updateBedroomState(){
 
@@ -2077,14 +1950,11 @@ maxByPeople
 
 if(current.checkbox.checked){
 
-current.checkbox.disabled =
-false;
+current.checkbox.disabled = false;
 
-current.input.disabled =
-false;
+current.input.disabled = false;
 
-current.input.max =
-realMax;
+current.input.max = realMax;
 
 
 let qty =
@@ -2103,28 +1973,22 @@ qty = 0;
 
 if(qty > realMax){
 
-qty =
-realMax;
+qty = realMax;
 
 }
 
 
-current.input.value =
-qty;
+current.input.value = qty;
 
 }
-
 
 else{
 
-current.input.value =
-0;
+current.input.value = 0;
 
-current.input.disabled =
-true;
+current.input.disabled = true;
 
-current.input.max =
-realMax;
+current.input.max = realMax;
 
 
 current.checkbox.disabled =
@@ -2146,10 +2010,6 @@ updateBedroomSummary();
 
 }
 
-
-/* =========================================================
-   VISIBILIDAD HOSPEDERÍA
-========================================================= */
 
 function updateBedroomDistributionVisibility(){
 
@@ -2175,10 +2035,6 @@ updateBedroomState();
 }
 
 
-/* =========================================================
-   EVENTOS HABITACIONES
-========================================================= */
-
 getBedroomData()
 .forEach(
 item => {
@@ -2191,21 +2047,17 @@ item.checkbox.addEventListener(
 
 if(item.checkbox.checked){
 
-item.input.value =
-0;
+item.input.value = 0;
 
-item.input.disabled =
-false;
+item.input.disabled = false;
 
 }
 
 else{
 
-item.input.value =
-0;
+item.input.value = 0;
 
-item.input.disabled =
-true;
+item.input.disabled = true;
 
 }
 
@@ -2245,14 +2097,12 @@ value = 0;
 
 if(value > max){
 
-value =
-max;
+value = max;
 
 }
 
 
-item.input.value =
-value;
+item.input.value = value;
 
 
 updateBedroomState();
@@ -2319,7 +2169,6 @@ lodgingHelp.textContent =
 
 }
 
-
 else if(fortyFiveOrMore){
 
 if(
@@ -2337,7 +2186,6 @@ lodgingHelp.textContent =
 'Con 45 personas o más puedes elegir Hospedería, Albergue o valorar ambas opciones.';
 
 }
-
 
 else{
 
@@ -2446,6 +2294,30 @@ return result;
 }
 
 
+function getBreakfastDates(){
+
+const dates =
+getStayDates();
+
+
+if(dates.length <= 1){
+
+return [];
+
+}
+
+
+/*
+Desayuno:
+desde el día siguiente a llegada
+hasta el día de salida incluido.
+*/
+
+return dates.slice(1);
+
+}
+
+
 function getDateKey(date){
 
 return (
@@ -2466,7 +2338,7 @@ date.getDate()
 
 
 /* =========================================================
-   RESTAURACIÓN + PICNIC
+   RESTAURACIÓN MULTILÍNEA
 ========================================================= */
 
 const mealsCheckbox =
@@ -2483,6 +2355,46 @@ const mealsDays =
 document.getElementById(
 'mealsDays'
 );
+
+
+function createPicnicToggle(
+name,
+checked=false
+){
+
+const wrapper =
+document.createElement('label');
+
+
+wrapper.className =
+'picnic-control';
+
+
+wrapper.innerHTML = `
+
+<span>
+Picnic
+</span>
+
+<span class="picnic-switch">
+
+<input
+type="checkbox"
+name="${name}"
+value="Sí"
+${checked ? 'checked' : ''}
+>
+
+<span class="picnic-slider"></span>
+
+</span>
+
+`;
+
+
+return wrapper;
+
+}
 
 
 function createMealService(
@@ -2503,17 +2415,17 @@ type === 'lunch'
 : 'cena';
 
 
-const row =
+const block =
 document.createElement('div');
 
 
-row.className =
-'meal-row';
+block.className =
+'meal-service-block';
 
 
-row.innerHTML = `
+block.innerHTML = `
 
-<label class="meal-choice">
+<label class="meal-service-header">
 
 <input
 type="checkbox"
@@ -2522,152 +2434,551 @@ name="${label} ${dateKey}"
 value="Sí"
 >
 
-<span class="meal-label">
+<span>
 ${label}
 </span>
 
 </label>
 
+<div
+class="meal-lines"
+hidden
+></div>
 
-<div class="meal-controls">
+<div
+class="meal-warning"
+hidden
+></div>
+
+`;
 
 
-<div class="meal-people-inline">
+const serviceCheckbox =
+block.querySelector(
+'.meal-service-checkbox'
+);
 
-<label>
+
+const linesContainer =
+block.querySelector(
+'.meal-lines'
+);
+
+
+const warning =
+block.querySelector(
+'.meal-warning'
+);
+
+
+let lineCounter = 0;
+
+let acceptedUnder =
+false;
+
+let acceptedOver =
+false;
+
+
+function getLines(){
+
+return [
+...linesContainer.querySelectorAll(
+'.meal-line'
+)
+];
+
+}
+
+
+function getTotal(){
+
+return getLines()
+.reduce(
+(total,line) => {
+
+const input =
+line.querySelector(
+'.meal-person-input'
+);
+
+
+return total +
+parseInt(
+input.value || '0',
+10
+);
+
+},
+0
+);
+
+}
+
+
+function resetAcceptance(){
+
+acceptedUnder = false;
+
+acceptedOver = false;
+
+}
+
+
+function hideWarning(){
+
+warning.hidden = true;
+
+warning.innerHTML = '';
+
+}
+
+
+function addMealLine(
+people,
+picnic=false
+){
+
+lineCounter++;
+
+
+const line =
+document.createElement('div');
+
+
+line.className =
+'meal-line';
+
+
+line.innerHTML = `
+
+<span class="meal-line-label">
+${label} ${lineCounter}
+</span>
+
+<label class="meal-person-control">
 
 Personas
 
 <input
 type="number"
-class="meal-people-input"
-name="Personas ${serviceKey} ${dateKey}"
+class="meal-person-input"
+name="${label} ${dateKey} línea ${lineCounter} personas"
 min="1"
 max="999"
-value="${defaultPeople || ''}"
-disabled
+value="${people || ''}"
+required
 >
 
 </label>
-
-</div>
-
-
-<label class="picnic-control">
-
-<span>
-Picnic
-</span>
-
-<span class="picnic-switch">
-
-<input
-type="checkbox"
-class="picnic-checkbox"
-name="Picnic ${label} ${dateKey}"
-value="Sí"
-disabled
->
-
-<span class="picnic-slider"></span>
-
-</span>
-
-</label>
-
-
-</div>
 
 `;
 
 
-const checkbox =
-row.querySelector(
-'.meal-service-checkbox'
+line.appendChild(
+
+createPicnicToggle(
+`Picnic ${label} ${dateKey} línea ${lineCounter}`,
+picnic
+)
+
 );
+
+
+if(lineCounter > 1){
+
+const remove =
+document.createElement('button');
+
+
+remove.type =
+'button';
+
+remove.className =
+'meal-line-remove';
+
+remove.textContent =
+'Eliminar';
+
+
+remove.addEventListener(
+'click',
+() => {
+
+line.remove();
+
+resetAcceptance();
+
+evaluateMealTotal();
+
+}
+
+);
+
+
+line.appendChild(
+remove
+);
+
+}
 
 
 const peopleInput =
-row.querySelector(
-'.meal-people-input'
+line.querySelector(
+'.meal-person-input'
 );
 
 
-const picnicCheckbox =
-row.querySelector(
-'.picnic-checkbox'
-);
-
-
-checkbox.addEventListener(
-'change',
+peopleInput.addEventListener(
+'input',
 () => {
 
+resetAcceptance();
 
-peopleInput.disabled =
-!checkbox.checked;
-
-
-peopleInput.required =
-checkbox.checked;
-
-
-picnicCheckbox.disabled =
-!checkbox.checked;
-
-
-/*
-Si se desmarca Comida/Cena,
-el picnic también se desmarca.
-*/
-
-if(!checkbox.checked){
-
-picnicCheckbox.checked =
-false;
-
-}
-
-
-if(
-checkbox.checked &&
-!peopleInput.value &&
-defaultPeople
-){
-
-peopleInput.value =
-defaultPeople;
-
-}
+evaluateMealTotal();
 
 }
 
 );
 
 
-return row;
+linesContainer.appendChild(
+line
+);
 
 }
 
 
-function generateMealsDays(){
+function resetServiceToGroupSize(){
 
-mealsDays.innerHTML =
-'';
+linesContainer.innerHTML = '';
+
+lineCounter = 0;
+
+resetAcceptance();
+
+addMealLine(
+parseInt(
+groupSize.value || '0',
+10
+)
+);
+
+hideWarning();
+
+}
 
 
-if(!mealsCheckbox.checked){
+function showUnderWarning(
+total,
+groupTotal
+){
 
-mealsSection.hidden =
-true;
+if(acceptedUnder){
+
+hideWarning();
 
 return;
 
 }
 
 
-mealsSection.hidden =
-false;
+const remaining =
+Math.max(
+0,
+groupTotal-total
+);
+
+
+warning.hidden = false;
+
+
+warning.innerHTML = `
+
+<strong>
+Has indicado ${total} ${label.toLowerCase()}${total === 1 ? '' : 's'}
+para un grupo de ${groupTotal} personas.
+</strong>
+
+<div>
+¿Quieres añadir otro servicio para las
+${remaining} personas restantes?
+</div>
+
+<div class="meal-warning-actions">
+
+<button
+type="button"
+class="meal-under-yes"
+>
+Sí
+</button>
+
+<button
+type="button"
+class="meal-under-no"
+>
+No
+</button>
+
+</div>
+
+`;
+
+
+warning
+.querySelector(
+'.meal-under-yes'
+)
+.addEventListener(
+'click',
+() => {
+
+addMealLine(
+remaining
+);
+
+acceptedUnder = true;
+
+hideWarning();
+
+evaluateMealTotal();
+
+}
+
+);
+
+
+warning
+.querySelector(
+'.meal-under-no'
+)
+.addEventListener(
+'click',
+() => {
+
+acceptedUnder = true;
+
+hideWarning();
+
+}
+
+);
+
+}
+
+
+function showOverWarning(
+total,
+groupTotal
+){
+
+if(acceptedOver){
+
+hideWarning();
+
+return;
+
+}
+
+
+warning.hidden = false;
+
+
+warning.innerHTML = `
+
+<strong>
+Has solicitado ${total} ${label.toLowerCase()}${total === 1 ? '' : 's'}
+para un grupo de ${groupTotal} personas.
+</strong>
+
+<div>
+El número de servicios es superior al número
+de personas alojadas. ¿Es correcto?
+</div>
+
+<div class="meal-warning-actions">
+
+<button
+type="button"
+class="meal-over-yes"
+>
+Sí
+</button>
+
+<button
+type="button"
+class="meal-over-no"
+>
+No
+</button>
+
+</div>
+
+`;
+
+
+warning
+.querySelector(
+'.meal-over-yes'
+)
+.addEventListener(
+'click',
+() => {
+
+acceptedOver = true;
+
+hideWarning();
+
+}
+
+);
+
+
+warning
+.querySelector(
+'.meal-over-no'
+)
+.addEventListener(
+'click',
+() => {
+
+resetServiceToGroupSize();
+
+}
+
+);
+
+}
+
+
+function evaluateMealTotal(){
+
+if(!serviceCheckbox.checked){
+
+hideWarning();
+
+return;
+
+}
+
+
+const groupTotal =
+parseInt(
+groupSize.value || '0',
+10
+);
+
+
+if(groupTotal < 1){
+
+hideWarning();
+
+return;
+
+}
+
+
+const total =
+getTotal();
+
+
+if(total < groupTotal){
+
+showUnderWarning(
+total,
+groupTotal
+);
+
+return;
+
+}
+
+
+if(total > groupTotal){
+
+showOverWarning(
+total,
+groupTotal
+);
+
+return;
+
+}
+
+
+hideWarning();
+
+}
+
+
+serviceCheckbox.addEventListener(
+'change',
+() => {
+
+
+linesContainer.hidden =
+!serviceCheckbox.checked;
+
+
+if(serviceCheckbox.checked){
+
+if(!getLines().length){
+
+addMealLine(
+parseInt(
+groupSize.value || '0',
+10
+)
+);
+
+}
+
+evaluateMealTotal();
+
+}
+
+else{
+
+linesContainer.innerHTML = '';
+
+lineCounter = 0;
+
+resetAcceptance();
+
+hideWarning();
+
+}
+
+}
+
+);
+
+
+block.evaluateMealTotal =
+evaluateMealTotal;
+
+
+return block;
+
+}
+
+
+function generateMealsDays(){
+
+mealsDays.innerHTML = '';
+
+
+if(!mealsCheckbox.checked){
+
+mealsSection.hidden = true;
+
+return;
+
+}
+
+
+mealsSection.hidden = false;
 
 
 const dates =
@@ -2736,10 +3047,7 @@ const isDeparture =
 index === dates.length-1;
 
 
-/*
-Llegada:
-solo Cena
-*/
+/* llegada → solo cena */
 
 if(
 !isArrival ||
@@ -2759,10 +3067,7 @@ defaultPeople
 }
 
 
-/*
-Salida:
-solo Comida
-*/
+/* salida → solo comida */
 
 if(
 !isDeparture ||
@@ -2794,6 +3099,119 @@ day
 
 
 /* =========================================================
+   DESAYUNO PICNIC
+========================================================= */
+
+const breakfastPicnicCheckbox =
+document.getElementById(
+'breakfastPicnicCheckbox'
+);
+
+const breakfastPicnicSection =
+document.getElementById(
+'breakfastPicnicSection'
+);
+
+const breakfastDays =
+document.getElementById(
+'breakfastDays'
+);
+
+
+function generateBreakfastDays(){
+
+breakfastDays.innerHTML = '';
+
+
+if(!breakfastPicnicCheckbox.checked){
+
+breakfastPicnicSection.hidden =
+true;
+
+return;
+
+}
+
+
+breakfastPicnicSection.hidden =
+false;
+
+
+const dates =
+getBreakfastDates();
+
+
+if(!dates.length){
+
+breakfastDays.innerHTML =
+'<p class="form-note">Indica primero una estancia con al menos una noche para generar los desayunos.</p>';
+
+return;
+
+}
+
+
+dates.forEach(
+date => {
+
+
+const dateKey =
+getDateKey(date);
+
+
+const row =
+document.createElement('div');
+
+
+row.className =
+'breakfast-day';
+
+
+const dateBlock =
+document.createElement('div');
+
+
+dateBlock.className =
+'breakfast-day-date';
+
+
+dateBlock.innerHTML = `
+
+${formatDate(date)}
+
+<small>
+Desayuno incluido
+</small>
+
+`;
+
+
+row.appendChild(
+dateBlock
+);
+
+
+row.appendChild(
+
+createPicnicToggle(
+`Desayuno picnic ${dateKey}`
+)
+
+);
+
+
+breakfastDays.appendChild(
+row
+);
+
+}
+
+);
+
+}
+
+
+/* =========================================================
    SALAS
 ========================================================= */
 
@@ -2815,50 +3233,15 @@ document.getElementById(
 
 const availableRooms = [
 
-{
-name:'Sala 3031',
-capacity:25
-},
-
-{
-name:'Sala 2003',
-capacity:30
-},
-
-{
-name:'Sala 2309',
-capacity:30
-},
-
-{
-name:'Sala 2004',
-capacity:40
-},
-
-{
-name:'Sala 2001',
-capacity:50
-},
-
-{
-name:'Sala 2208',
-capacity:60
-},
-
-{
-name:'Sala 2303',
-capacity:60
-},
-
-{
-name:'Sala 2002',
-capacity:120
-},
-
-{
-name:'Sala 2301',
-capacity:200
-}
+{name:'Sala 3031',capacity:25},
+{name:'Sala 2003',capacity:30},
+{name:'Sala 2309',capacity:30},
+{name:'Sala 2004',capacity:40},
+{name:'Sala 2001',capacity:50},
+{name:'Sala 2208',capacity:60},
+{name:'Sala 2303',capacity:60},
+{name:'Sala 2002',capacity:120},
+{name:'Sala 2301',capacity:200}
 
 ];
 
@@ -2869,18 +3252,14 @@ attendees,
 previousValue=''
 ){
 
-select.innerHTML =
-'';
+select.innerHTML = '';
 
 
 const recommendation =
-document.createElement(
-'option'
-);
+document.createElement('option');
 
 
-recommendation.value =
-'';
+recommendation.value = '';
 
 
 recommendation.textContent =
@@ -2909,9 +3288,7 @@ room => {
 
 
 const option =
-document.createElement(
-'option'
-);
+document.createElement('option');
 
 
 option.value =
@@ -2956,9 +3333,7 @@ defaultPeople
 ){
 
 const row =
-document.createElement(
-'div'
-);
+document.createElement('div');
 
 
 row.className =
@@ -3096,15 +3471,11 @@ defaultPeople
 ){
 
 const dateKey =
-getDateKey(
-date
-);
+getDateKey(date);
 
 
 const day =
-document.createElement(
-'div'
-);
+document.createElement('div');
 
 
 day.className =
@@ -3112,21 +3483,15 @@ day.className =
 
 
 const title =
-document.createElement(
-'h4'
-);
+document.createElement('h4');
 
 
 title.textContent =
-formatDate(
-date
-);
+formatDate(date);
 
 
 const toggleLabel =
-document.createElement(
-'label'
-);
+document.createElement('label');
 
 
 toggleLabel.className =
@@ -3134,9 +3499,7 @@ toggleLabel.className =
 
 
 const toggle =
-document.createElement(
-'input'
-);
+document.createElement('input');
 
 
 toggle.type =
@@ -3152,9 +3515,7 @@ toggle.value =
 
 
 const toggleText =
-document.createElement(
-'span'
-);
+document.createElement('span');
 
 
 toggleText.textContent =
@@ -3172,23 +3533,18 @@ toggleText
 
 
 const content =
-document.createElement(
-'div'
-);
+document.createElement('div');
 
 
 content.className =
 'room-day-content';
 
 
-content.hidden =
-true;
+content.hidden = true;
 
 
 const requests =
-document.createElement(
-'div'
-);
+document.createElement('div');
 
 
 requests.className =
@@ -3196,9 +3552,7 @@ requests.className =
 
 
 const addButton =
-document.createElement(
-'button'
-);
+document.createElement('button');
 
 
 addButton.type =
@@ -3214,9 +3568,7 @@ addButton.textContent =
 
 
 const help =
-document.createElement(
-'div'
-);
+document.createElement('div');
 
 
 help.className =
@@ -3257,8 +3609,7 @@ content
 );
 
 
-let roomCounter =
-1;
+let roomCounter = 1;
 
 
 function addRoom(){
@@ -3302,12 +3653,9 @@ addRoom();
 
 else{
 
-requests.innerHTML =
-'';
+requests.innerHTML = '';
 
-
-roomCounter =
-1;
+roomCounter = 1;
 
 }
 
@@ -3334,22 +3682,19 @@ return day;
 
 function generateRoomDays(){
 
-roomDays.innerHTML =
-'';
+roomDays.innerHTML = '';
 
 
 if(!roomsCheckbox.checked){
 
-roomsSection.hidden =
-true;
+roomsSection.hidden = true;
 
 return;
 
 }
 
 
-roomsSection.hidden =
-false;
+roomsSection.hidden = false;
 
 
 const dates =
@@ -3404,7 +3749,6 @@ groupSize.addEventListener(
 
 updateLodgingOptions();
 
-
 updateBedroomState();
 
 
@@ -3426,8 +3770,6 @@ generateRoomDays();
 );
 
 
-/* CHECK-IN */
-
 arrivalInput.addEventListener(
 'change',
 () => {
@@ -3443,6 +3785,13 @@ generateMealsDays();
 }
 
 
+if(breakfastPicnicCheckbox.checked){
+
+generateBreakfastDays();
+
+}
+
+
 if(roomsCheckbox.checked){
 
 generateRoomDays();
@@ -3454,8 +3803,6 @@ generateRoomDays();
 );
 
 
-/* CHECK-OUT */
-
 departureInput.addEventListener(
 'change',
 () => {
@@ -3464,6 +3811,13 @@ departureInput.addEventListener(
 if(mealsCheckbox.checked){
 
 generateMealsDays();
+
+}
+
+
+if(breakfastPicnicCheckbox.checked){
+
+generateBreakfastDays();
 
 }
 
@@ -3482,6 +3836,12 @@ generateRoomDays();
 mealsCheckbox.addEventListener(
 'change',
 generateMealsDays
+);
+
+
+breakfastPicnicCheckbox.addEventListener(
+'change',
+generateBreakfastDays
 );
 
 
@@ -3523,11 +3883,6 @@ return;
 
 }
 
-
-/*
-Validación adicional de fechas,
-aunque el calendario ya lo impide.
-*/
 
 if(
 arrivalInput.value &&
@@ -3572,9 +3927,7 @@ assigned !== total &&
 ){
 
 alert(
-
 'La distribución de habitaciones no cubre a todas las personas del grupo. Completa la distribución o marca “Quiero que Martí Codolar me proponga una distribución”.'
-
 );
 
 
