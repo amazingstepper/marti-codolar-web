@@ -1688,6 +1688,19 @@ se alojarán en cada una.
 </p>
 
 
+<p
+id="hostelMinimumNote"
+class="form-note"
+hidden
+>
+
+<strong>Importante:</strong>
+Si combinas Hospedería y Albergue,
+al menos 45 personas deben alojarse en el Albergue.
+
+</p>
+
+
 <div class="hostel-room-grid">
 
 
@@ -2875,6 +2888,12 @@ document.getElementById(
 );
 
 
+const hostelMinimumNote =
+document.getElementById(
+'hostelMinimumNote'
+);
+
+
 function usesHospederia(){
 
 return (
@@ -2968,6 +2987,10 @@ bedroomDistributionSection.hidden =
 
 hostelDistributionSection.hidden =
 !usesHostel();
+
+
+hostelMinimumNote.hidden =
+lodgingPreference.value !== 'combinado';
 
 
 updateAllAccommodationStates();
@@ -3836,7 +3859,27 @@ const totalAccommodation =
 calculateTotalAccommodationPeople();
 
 
-if(totalAccommodation === groupTotal){
+if(assigned < 45){
+
+const minimumRemaining =
+45 - assigned;
+
+
+status =
+assigned === 0
+?
+'Para utilizar el Albergue en esta combinación debes asignar al menos 45 personas al Albergue.'
+:
+`El Albergue necesita al menos 45 personas en esta combinación. Faltan ${minimumRemaining} ${minimumRemaining === 1 ? 'persona' : 'personas'} por asignar al Albergue.`;
+
+
+hostelSummary.classList.add(
+'warning'
+);
+
+}
+
+else if(totalAccommodation === groupTotal){
 
 status =
 'La distribución combinada del grupo está completa ✓';
@@ -6898,11 +6941,7 @@ email:email,
 '05 · SALAS':getRoomsText(),
 '06 · OTROS SERVICIOS':`Parking para autobús: ${busParkingCheckbox.checked ? 'Sí' : 'No'}`,
 '07 · DATOS DE CONTACTO':getContactEmailText(),
-'08 · OBSERVACIONES':observations || 'Ninguna',
-'09 · CONTROL DE ENVÍO':[
-`Privacidad aceptada: ${privacyCheckbox.checked ? 'Sí' : 'No'}`,
-`Resumen revisado: ${summaryConfirmation.checked ? 'Sí' : 'No'}`
-].join('\n')
+'08 · OBSERVACIONES':observations || 'Ninguna'
 };
 }
 
