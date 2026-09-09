@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Martí Codolar · Dashboard Reservas · Prototipo V1</title>
+  <style>
+    :root {
+      --bg: #f5f6f7;
+      --surface: #ffffff;
+      --surface-2: #f0f2f4;
+      --text: #1f2933;
+      --muted: #66717c;
+      --line: #dfe4e8;
+      --strong: #111820;
+      --accent: #2f5d50;
+      --accent-soft: #e7f0ed;
+      --danger: #a53030;
+      --danger-soft: #f8e9e9;
+      --warning: #8a5b12;
+      --warning-soft: #fff2d8;
+      --success: #2f6a45;
+      --success-soft: #e8f3ec;
+      --shadow: 0 10px 30px rgba(20, 31, 41, 0.08);
+      --radius: 14px;
+      --sidebar: 250px;
+      --topbar: 68px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.45;
+    }
+    button, input, select, textarea { font: inherit; }
+    button, a, select { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(47, 93, 80, .25);
+      outline-offset: 2px;
+    }
+
+    .app { min-height: 100vh; }
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--sidebar);
+      background: var(--strong);
+      color: #fff;
+      padding: 18px 14px;
+      z-index: 50;
+      overflow-y: auto;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      margin-bottom: 14px;
+    }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.11);
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+    .brand strong { display:block; font-size: 15px; }
+    .brand small { color: rgba(255,255,255,.66); }
+
+    .nav-title {
+      margin: 16px 10px 8px;
+      color: rgba(255,255,255,.48);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .nav { display: grid; gap: 4px; }
+    .nav button {
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,.78);
+      text-align: left;
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav button:hover, .nav button.active {
+      background: rgba(255,255,255,.1);
+      color: #fff;
+    }
+    .nav .badge {
+      min-width: 24px;
+      padding: 2px 7px;
+      background: rgba(255,255,255,.14);
+      border-radius: 999px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar);
+      right: 0;
+      height: var(--topbar);
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 22px;
+      z-index: 45;
+      backdrop-filter: blur(10px);
+    }
+    .menu-toggle {
+      display:none;
+      border:1px solid var(--line);
+      background:var(--surface);
+      width:42px;
+      height:42px;
+      border-radius:10px;
+      cursor:pointer;
+    }
+    .search {
+      flex: 1;
+      max-width: 720px;
+      position: relative;
+    }
+    .search input {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 12px;
+      background: var(--surface-2);
+      color: var(--text);
+    }
+    .top-actions { margin-left: auto; display:flex; align-items:center; gap:8px; }
+    .role-select {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--text);
+    }
+    .user-chip {
+      min-height: 42px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background: var(--surface);
+    }
+    .avatar {
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      background: var(--strong);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    main {
+      margin-left: var(--sidebar);
+      padding: calc(var(--topbar) + 24px) 24px 40px;
+      min-height:100vh;
+    }
+    .page { display:none; }
+    .page.active { display:block; }
+    .page-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom: 18px;
+    }
+    .page-head h1 { margin:0 0 4px; font-size: clamp(24px, 3vw, 34px); }
+    .page-head p { margin:0; color:var(--muted); }
+
+    .grid-kpi {
+      display:grid;
+      grid-template-columns: repeat(5, minmax(0,1fr));
+      gap:12px;
+      margin-bottom: 18px;
+    }
+    .card {
+      background: var(--surface);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .kpi { padding:16px; cursor:pointer; transition:.15s ease; }
+    .kpi:hover { transform: translateY(-2px); }
+    .kpi strong { display:block; font-size:28px; margin-top:4px; }
+    .kpi small { color:var(--muted); }
+
+    .layout-2 {
+      display:grid;
+      grid-template-columns: minmax(0,1.6fr) minmax(300px,.8fr);
+      gap:16px;
+    }
+    .section { padding:18px; margin-bottom:16px; }
+    .section-head {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+    .section-head h2 { margin:0; font-size:19px; }
+    .section-head small { color:var(--muted); }
+
+    .btn {
+      border:1px solid var(--line);
+      background: var(--surface);
+      color:var(--text);
+      min-height:40px;
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .btn:hover { background:var(--surface-2); }
+    .btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .btn.danger { background:var(--danger); border-color:var(--danger); color:#fff; }
+    .btn.ghost { background:transparent; }
+    .btn.small { min-height:34px; padding:6px 9px; font-size:13px; }
+
+    .list { display:grid; gap:8px; }
+    .row-card {
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      background:#fff;
+      display:grid;
+      grid-template-columns: minmax(130px,.8fr) minmax(170px,1.3fr) minmax(160px,1.2fr) minmax(120px,.8fr) auto;
+      gap:10px;
+      align-items:center;
+    }
+    .row-card:hover { border-color:#c7d0d7; }
+    .row-card strong { font-size:14px; }
+    .row-card small { display:block; color:var(--muted); margin-top:2px; }
+
+    .tag {
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      width:max-content;
+      max-width:100%;
+      padding:4px 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      background:var(--surface-2);
+      color:var(--text);
+    }
+    .tag.warning { background:var(--warning-soft); color:var(--warning); }
+    .tag.success { background:var(--success-soft); color:var(--success); }
+    .tag.danger { background:var(--danger-soft); color:var(--danger); }
+    .tag.info { background:var(--accent-soft); color:var(--accent); }
+
+    .filters {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .filters button.active { background:var(--strong); color:#fff; border-color:var(--strong); }
+
+    .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:12px; }
+    table { width:100%; border-collapse:collapse; min-width:880px; background:#fff; }
+    th, td { padding:12px 13px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { background:var(--surface-2); color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+    tbody tr { cursor:pointer; }
+    tbody tr:hover { background:#fafbfb; }
+
+    .request-detail {
+      position: fixed;
+      inset: var(--topbar) 0 0 var(--sidebar);
+      background:var(--bg);
+      z-index:40;
+      overflow:auto;
+      display:none;
+    }
+    .request-detail.open { display:block; }
+    .sticky-record {
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(255,255,255,.98);
+      border-bottom:1px solid var(--line);
+      padding:12px 24px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      justify-content:space-between;
+      backdrop-filter:blur(10px);
+    }
+    .record-main { min-width:0; }
+    .record-main strong { display:block; font-size:16px; }
+    .record-meta { color:var(--muted); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .record-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .record-body { padding:20px 24px 40px; max-width:1400px; margin:0 auto; }
+    .record-summary {
+      display:grid;
+      grid-template-columns: repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .info-box { padding:12px; border:1px solid var(--line); border-radius:12px; background:#fff; }
+    .info-box small { color:var(--muted); display:block; margin-bottom:4px; }
+
+    .tabs {
+      display:flex;
+      gap:6px;
+      overflow:auto;
+      padding-bottom:8px;
+      margin-bottom:14px;
+    }
+    .tabs button {
+      white-space:nowrap;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:999px;
+      padding:8px 12px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .tabs button.active { background:var(--strong); color:#fff; border-color:var(--strong); }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    .service-grid { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:12px; }
+    .service-card { border:1px solid var(--line); border-radius:12px; padding:14px; background:#fff; }
+    .service-card h3 { margin:0 0 8px; font-size:16px; }
+    .service-card p { margin:4px 0; color:var(--muted); font-size:14px; }
+    .service-card .service-status { margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; }
+
+    .empty {
+      padding:28px;
+      text-align:center;
+      color:var(--muted);
+      border:1px dashed var(--line);
+      border-radius:12px;
+      background:rgba(255,255,255,.55);
+    }
+
+    .notice {
+      padding:12px 14px;
+      border-radius:12px;
+      background:var(--accent-soft);
+      color:var(--accent);
+      border:1px solid rgba(47,93,80,.16);
+      margin-bottom:14px;
+    }
+    .notice.warning { background:var(--warning-soft); color:var(--warning); border-color:rgba(138,91,18,.15); }
+    .notice.danger { background:var(--danger-soft); color:var(--danger); border-color:rgba(165,48,48,.15); }
+
+    .toast {
+      position:fixed;
+      right:20px;
+      bottom:20px;
+      z-index:100;
+      max-width:380px;
+      background:var(--strong);
+      color:#fff;
+      padding:12px 14px;
+      border-radius:12px;
+      box-shadow:var(--shadow);
+      display:none;
+    }
+    .toast.show { display:block; }
+
+    dialog {
+      border:0;
+      border-radius:16px;
+      padding:0;
+      max-width:520px;
+      width:calc(100% - 32px);
+      box-shadow:0 30px 80px rgba(0,0,0,.25);
+    }
+    dialog::backdrop { background:rgba(0,0,0,.45); }
+    .dialog-body { padding:20px; }
+    .dialog-body h2 { margin:0 0 8px; }
+    .dialog-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
+
+    .role-placeholder {
+      max-width:760px;
+      margin:50px auto;
+      padding:28px;
+      text-align:center;
+    }
+
+    @media (max-width: 1180px) {
+      .grid-kpi { grid-template-columns: repeat(3,minmax(0,1fr)); }
+      .record-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 900px) {
+      :root { --sidebar: 0px; }
+      .sidebar {
+        width:250px;
+        transform:translateX(-100%);
+        transition:.2s ease;
+      }
+      .sidebar.open { transform:translateX(0); }
+      .menu-toggle { display:block; }
+      main { margin-left:0; }
+      .topbar { left:0; }
+      .request-detail { left:0; }
+      .layout-2 { grid-template-columns:1fr; }
+      .service-grid { grid-template-columns:1fr; }
+      .user-chip span:last-child { display:none; }
+    }
+    @media (max-width: 680px) {
+      .topbar { padding:8px 10px; gap:8px; }
+      .search { display:none; }
+      .role-select { max-width:160px; }
+      main { padding: calc(var(--topbar) + 16px) 12px 28px; }
+      .grid-kpi { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .page-head { display:block; }
+      .page-head .btn { margin-top:10px; }
+      .row-card { grid-template-columns:1fr; }
+      .record-summary { grid-template-columns:1fr 1fr; }
+      .sticky-record { padding:10px 12px; align-items:flex-start; }
+      .record-meta { white-space:normal; }
+      .record-actions .btn { padding:7px 9px; font-size:12px; }
+      .record-body { padding:14px 12px 28px; }
+    }
+    @media (max-width: 430px) {
+      .grid-kpi { grid-template-columns:1fr 1fr; }
+      .record-summary { grid-template-columns:1fr; }
+      .role-select { max-width:135px; }
+      .record-actions { width:100%; }
+      .sticky-record { flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+    <div class="brand">
+      <div class="brand-mark">MC</div>
+      <div><strong>Martí Codolar</strong><small>Backoffice · prototipo V1</small></div>
+    </div>
+    <div id="reservasNav">
+      <div class="nav-title">Reservas</div>
+      <nav class="nav">
+        <button class="active" data-page="inicio">Inicio</button>
+        <button data-page="solicitudes">Solicitudes <span class="badge" id="navNewCount">3</span></button>
+        <button data-page="expedientes">Expedientes</button>
+        <button data-page="tareas">Tareas <span class="badge">4</span></button>
+        <button data-page="economia">Economía</button>
+      </nav>
+    </div>
+    <div id="adminNav" hidden>
+      <div class="nav-title">Administración</div>
+      <nav class="nav">
+        <button data-placeholder="Administración">Usuarios y permisos</button>
+        <button data-placeholder="Administración">Configuración</button>
+        <button data-placeholder="Administración">Auditoría</button>
+      </nav>
+    </div>
+    <div id="contentNav" hidden>
+      <div class="nav-title">Contenidos</div>
+      <nav class="nav">
+        <button data-placeholder="Contenidos">Páginas</button>
+        <button data-placeholder="Contenidos">Salas</button>
+        <button data-placeholder="Contenidos">Alojamiento</button>
+        <button data-placeholder="Contenidos">Media</button>
+        <button data-placeholder="Contenidos">Idiomas</button>
+        <button data-placeholder="Contenidos">SEO</button>
+      </nav>
+    </div>
+  </aside>
+
+  <header class="topbar">
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+    <div class="search"><input id="globalSearch" type="search" placeholder="Buscar expediente, entidad, sala…" aria-label="Buscador global"></div>
+    <div class="top-actions">
+      <select class="role-select" id="roleSelect" aria-label="Rol activo">
+        <option value="reservas">Reservas / Comercial</option>
+        <option value="administrador">Administrador</option>
+        <option value="contenidos">Contenidos</option>
+      </select>
+      <div class="user-chip"><span class="avatar">DB</span><span>David</span></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="page active" id="page-inicio">
+      <div class="page-head">
+        <div><h1>Inicio · Reservas</h1><p>Prioridad operativa del departamento de Reservas.</p></div>
+        <button class="btn" data-page-jump="solicitudes">Ver solicitudes</button>
+      </div>
+
+      <div class="grid-kpi">
+        <div class="card kpi" data-kpi="new"><small>Solicitudes nuevas</small><strong id="kpiNew">3</strong><span class="tag info">Sin tramitar</span></div>
+        <div class="card kpi"><small>Cambios pendientes</small><strong>2</strong><span class="tag warning">Revisión</span></div>
+        <div class="card kpi"><small>Esperando cliente</small><strong>4</strong><span class="tag">Seguimiento</span></div>
+        <div class="card kpi"><small>Tareas vencidas</small><strong>1</strong><span class="tag danger">Atención</span></div>
+        <div class="card kpi"><small>Próximos 7 días</small><strong>5</strong><span class="tag success">Llegadas/eventos</span></div>
+      </div>
+
+      <div class="layout-2">
+        <div>
+          <section class="card section">
+            <div class="section-head"><div><h2>Necesitan atención</h2><small>Expedientes con una acción pendiente clara.</small></div></div>
+            <div class="list">
+              <div class="row-card"><div><strong>MC-2027-00127</strong><small>Colegio Sant Jordi</small></div><div><strong>Cambio pendiente</strong><small>80 → 95 personas</small></div><div><span class="tag warning">Alta</span></div><div><small>Responsable</small><strong>David</strong></div><button class="btn small" data-open-request="MC-2027-00127">Abrir</button></div>
+              <div class="row-card"><div><strong>MC-2027-00131</strong><small>Fundació Delta</small></div><div><strong>Preparar presupuesto</strong><small>Grupo + salas</small></div><div><span class="tag">Normal</span></div><div><small>Responsable</small><strong>Marta</strong></div><button class="btn small" data-open-request="MC-2027-00131">Abrir</button></div>
+              <div class="row-card"><div><strong>MC-2027-00118</strong><small>Associació Nord</small></div><div><strong>Rooming list pendiente</strong><small>Llegada próxima</small></div><div><span class="tag warning">Alta</span></div><div><small>Responsable</small><strong>Ana</strong></div><button class="btn small">Abrir</button></div>
+            </div>
+          </section>
+
+          <section class="card section">
+            <div class="section-head"><div><h2>Solicitudes nuevas</h2><small>Solo grupos, salas y solicitudes combinadas.</small></div><button class="btn small" data-page-jump="solicitudes">Ver todas</button></div>
+            <div class="list" id="newRequestsPreview"></div>
+          </section>
+        </div>
+
+        <div>
+          <section class="card section">
+            <div class="section-head"><h2>Mis tareas</h2><button class="btn small" data-page-jump="tareas">Ver todas</button></div>
+            <div class="list">
+              <div class="info-box"><strong>Revisar disponibilidad</strong><small>MC-2027-00127 · hoy</small></div>
+              <div class="info-box"><strong>Preparar presupuesto</strong><small>MC-2027-00131 · mañana</small></div>
+              <div class="info-box"><strong>Validar rooming list</strong><small>MC-2027-00118 · vencida</small></div>
+            </div>
+          </section>
+
+          <section class="card section">
+            <div class="section-head"><h2>Pagos / releases</h2></div>
+            <div class="list">
+              <div class="info-box"><strong>MC-2027-00115</strong><small>2.º pago pendiente · release 12/10</small></div>
+              <div class="info-box"><strong>MC-2027-00122</strong><small>Último pago · release 14/10</small></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-solicitudes">
+      <div class="page-head">
+        <div><h1>Solicitudes</h1><p>Entrada del departamento de Reservas. Las reservas individuales no aparecen aquí.</p></div>
+      </div>
+      <div class="filters" id="requestFilters">
+        <button class="btn small active" data-filter="all">Todas</button>
+        <button class="btn small" data-filter="Nueva">Nuevas</button>
+        <button class="btn small" data-filter="En trámite">En trámite</button>
+        <button class="btn small" data-filter="Grupo">Grupos</button>
+        <button class="btn small" data-filter="Sala">Salas</button>
+        <button class="btn small" data-filter="Combinada">Combinadas</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Expediente</th><th>Entrada</th><th>Cliente / entidad</th><th>Tipo</th><th>Fechas</th><th>Personas</th><th>Estado</th><th>Responsable</th></tr></thead>
+          <tbody id="requestsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-expedientes">
+      <div class="page-head"><div><h1>Expedientes</h1><p>Expedientes activos de grupos, salas y solicitudes combinadas.</p></div></div>
+      <div class="notice">En esta V1, los expedientes se alimentan con datos de demostración. La persistencia real llegará cuando conectemos el prototipo a backend/base de datos.</div>
+      <div class="list">
+        <div class="row-card"><div><strong>MC-2027-00127</strong><small>Colegio Sant Jordi</small></div><div><strong>Grupo + salas</strong><small>15–18/11/2027</small></div><div><span class="tag warning">En trámite</span></div><div><small>Responsable</small><strong>David</strong></div><button class="btn small" data-open-request="MC-2027-00127">Abrir</button></div>
+        <div class="row-card"><div><strong>MC-2027-00131</strong><small>Fundació Delta</small></div><div><strong>Combinada</strong><small>03–05/12/2027</small></div><div><span class="tag info">Propuesta</span></div><div><small>Responsable</small><strong>Marta</strong></div><button class="btn small" data-open-request="MC-2027-00131">Abrir</button></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-tareas">
+      <div class="page-head"><div><h1>Tareas</h1><p>Pendientes asignados al rol activo de Reservas.</p></div></div>
+      <div class="card section">
+        <div class="list">
+          <div class="row-card"><div><strong>Revisar disponibilidad</strong><small>MC-2027-00127</small></div><div><strong>Alojamiento</strong><small>Hospedería + salas</small></div><div><span class="tag warning">Alta</span></div><div><small>Fecha límite</small><strong>Hoy</strong></div><button class="btn small" data-open-request="MC-2027-00127">Abrir</button></div>
+          <div class="row-card"><div><strong>Preparar presupuesto</strong><small>MC-2027-00131</small></div><div><strong>Economía</strong><small>Propuesta V2</small></div><div><span class="tag">Normal</span></div><div><small>Fecha límite</small><strong>Mañana</strong></div><button class="btn small" data-open-request="MC-2027-00131">Abrir</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-economia">
+      <div class="page-head"><div><h1>Economía</h1><p>Vista operativa de presupuestos, proformas, pagos y releases.</p></div></div>
+      <div class="notice warning">Ulyses sigue siendo la fuente principal. En este prototipo no se crea ni modifica ninguna reserva real.</div>
+      <div class="grid-kpi">
+        <div class="card kpi"><small>Releases próximos</small><strong>3</strong></div>
+        <div class="card kpi"><small>Pagos pendientes</small><strong>6</strong></div>
+        <div class="card kpi"><small>Presupuestos borrador</small><strong>2</strong></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-placeholder">
+      <div class="card role-placeholder">
+        <h1 id="placeholderTitle">Módulo</h1>
+        <p>Este módulo no forma parte del primer prototipo funcional. Lo añadiremos en una versión posterior sin mezclarlo con Reservas.</p>
+      </div>
+    </section>
+  </main>
+
+  <section class="request-detail" id="requestDetail" aria-label="Detalle del expediente">
+    <div class="sticky-record">
+      <div class="record-main">
+        <strong id="detailId">MC-2027-00000</strong>
+        <div class="record-meta" id="detailMeta">Cliente · fechas · personas · responsable</div>
+      </div>
+      <div class="record-actions">
+        <button class="btn ghost" id="closeDetail">← Volver</button>
+        <button class="btn danger" id="cancelRequest">Cancelar</button>
+        <button class="btn primary" id="processRequest">Tramitar</button>
+      </div>
+    </div>
+    <div class="record-body">
+      <div id="detailStatusNotice" class="notice">Solicitud recibida. Reservas debe decidir si cancelar o tramitar.</div>
+      <div class="record-summary">
+        <div class="info-box"><small>Estado</small><strong id="detailStatus">Nueva</strong></div>
+        <div class="info-box"><small>Cliente / entidad</small><strong id="detailClient">—</strong></div>
+        <div class="info-box"><small>Fechas</small><strong id="detailDates">—</strong></div>
+        <div class="info-box"><small>Personas</small><strong id="detailPeople">—</strong></div>
+      </div>
+
+      <div class="tabs" id="detailTabs">
+        <button class="active" data-tab="solicitud">Solicitud original</button>
+        <button data-tab="revision">Revisión</button>
+        <button data-tab="ficha">Ficha vigente</button>
+        <button data-tab="tareas">Tareas</button>
+        <button data-tab="economia">Economía</button>
+        <button data-tab="documentos">Documentos</button>
+        <button data-tab="rooming">Rooming list</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-solicitud">
+        <section class="card section">
+          <div class="section-head"><div><h2>Solicitud original</h2><small>Se conserva intacta y no se sobrescribe.</small></div><span class="tag info">Solicitado por cliente</span></div>
+          <div class="service-grid" id="originalBlocks"></div>
+        </section>
+      </div>
+
+      <div class="tab-panel" id="tab-revision">
+        <section class="card section">
+          <div class="section-head"><div><h2>Revisión de solicitud</h2><small>Disponible cuando el expediente está En trámite.</small></div></div>
+          <div id="reviewContent"></div>
+        </section>
+      </div>
+
+      <div class="tab-panel" id="tab-ficha">
+        <section class="card section">
+          <div class="section-head"><div><h2>Ficha vigente</h2><small>Solo datos aprobados por Martí Codolar.</small></div><div><button class="btn small" id="pdfBtn">PDF</button> <button class="btn small" id="excelBtn">Excel</button></div></div>
+          <div id="currentRecordContent" class="empty">Todavía no hay datos confirmados. La ficha se irá construyendo durante la tramitación.</div>
+        </section>
+      </div>
+
+      <div class="tab-panel" id="tab-tareas">
+        <section class="card section"><div class="section-head"><h2>Tareas</h2><button class="btn small">+ Nueva tarea</button></div><div class="list"><div class="info-box"><strong>Comprobar disponibilidad general</strong><small>Responsable: David · Pendiente</small></div></div></section>
+      </div>
+
+      <div class="tab-panel" id="tab-economia">
+        <section class="card section"><div class="section-head"><h2>Economía</h2></div><div class="empty">Presupuesto, proformas, pagos y releases se incorporarán en la siguiente iteración funcional.</div></section>
+      </div>
+
+      <div class="tab-panel" id="tab-documentos">
+        <section class="card section"><div class="section-head"><h2>Documentos</h2><button class="btn small">Subir documento</button></div><div class="empty">Sin documentos todavía.</div></section>
+      </div>
+
+      <div class="tab-panel" id="tab-rooming">
+        <section class="card section"><div class="section-head"><h2>Rooming list</h2><button class="btn small">Solicitar rooming list</button></div><div class="notice">Estados previstos: No solicitado → Solicitado → Recibido → En revisión → Validado.</div><div class="empty">No solicitado.</div></section>
+      </div>
+    </div>
+  </section>
+</div>
+
+<dialog id="cancelDialog">
+  <div class="dialog-body">
+    <h2>Cancelar solicitud</h2>
+    <p>La solicitud se marcará como cancelada por falta de disponibilidad.</p>
+    <div class="notice warning"><strong>Prototipo:</strong> aquí simulamos el correo automático al cliente. GitHub Pages por sí solo no puede enviarlo; la integración real se hará con backend/servicio de correo.</div>
+    <div class="dialog-actions"><button class="btn" id="cancelDialogBack">Volver</button><button class="btn danger" id="confirmCancel">Cancelar y preparar email</button></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const requests = [
+    {
+      id:'MC-2027-00142', created:'09/09 · 10:14', client:'Escola Mar Blau', type:'Grupo', dates:'12–15/11/2027', people:68, status:'Nueva', owner:'—',
+      blocks:[
+        ['Alojamiento','Hospedería · 68 personas · 12–15/11'],
+        ['Restauración','Cena de llegada + comidas/cenas intermedias + comida de salida'],
+        ['Observaciones','“Tenemos 4 vegetarianos y una persona celíaca.”']
+      ]
+    },
+    {
+      id:'MC-2027-00143', created:'09/09 · 11:02', client:'Empresa Atlas', type:'Sala', dates:'20/11/2027', people:120, status:'Nueva', owner:'—',
+      blocks:[
+        ['Sala','Jornada de trabajo · 09:00–18:00 · 120 asistentes'],
+        ['Coffee break','1 servicio asociado a sala · ubicación Parterre'],
+        ['Servicios adicionales','Torre de voz + micrófono · Papelógrafo']
+      ]
+    },
+    {
+      id:'MC-2027-00144', created:'09/09 · 12:37', client:'Associació Tramuntana', type:'Combinada', dates:'03–05/12/2027', people:84, status:'Nueva', owner:'—',
+      blocks:[
+        ['Alojamiento','Hospedería + Albergue · estancias variables'],
+        ['Salas','2 salas · varios horarios'],
+        ['Restauración','Servicios por día'],
+        ['Coffee breaks','2 servicios asociados a salas'],
+        ['Observaciones','“Necesitamos opciones veganas y revisar alergias más adelante.”']
+      ]
+    },
+    {
+      id:'MC-2027-00127', created:'08/09 · 09:40', client:'Colegio Sant Jordi', type:'Combinada', dates:'15–18/11/2027', people:95, status:'En trámite', owner:'David',
+      blocks:[
+        ['Alojamiento','Hospedería · 95 personas'],
+        ['Salas','Sala principal + sala de apoyo'],
+        ['Restauración','Servicios completos por día'],
+        ['Coffee break','2 servicios asociados a sala']
+      ]
+    },
+    {
+      id:'MC-2027-00131', created:'08/09 · 12:18', client:'Fundació Delta', type:'Combinada', dates:'03–05/12/2027', people:65, status:'En trámite', owner:'Marta',
+      blocks:[['Alojamiento','65 personas'],['Salas','1 sala principal'],['Restauración','Pendiente de propuesta']]
+    }
+  ];
+
+  let activeFilter = 'all';
+  let currentRequest = null;
+
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+
+  function toast(message){
+    const el = $('#toast');
+    el.textContent = message;
+    el.classList.add('show');
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(()=>el.classList.remove('show'), 3300);
+  }
+
+  function statusTag(status){
+    const cls = status === 'Nueva' ? 'info' : status === 'En trámite' ? 'warning' : status === 'Cancelada' ? 'danger' : 'success';
+    return `<span class="tag ${cls}">${status}</span>`;
+  }
+
+  function renderRequests(){
+    const tbody = $('#requestsTable');
+    const search = $('#globalSearch').value.trim().toLowerCase();
+    const filtered = requests.filter(r => {
+      const matchFilter = activeFilter === 'all' || r.status === activeFilter || r.type === activeFilter;
+      const hay = `${r.id} ${r.client} ${r.type} ${r.dates} ${r.status}`.toLowerCase();
+      return matchFilter && (!search || hay.includes(search));
+    });
+    tbody.innerHTML = filtered.map(r => `
+      <tr data-open-request="${r.id}">
+        <td><strong>${r.id}</strong></td><td>${r.created}</td><td>${r.client}</td><td>${r.type}</td><td>${r.dates}</td><td>${r.people}</td><td>${statusTag(r.status)}</td><td>${r.owner}</td>
+      </tr>`).join('') || `<tr><td colspan="8">No hay resultados.</td></tr>`;
+
+    const newCount = requests.filter(r=>r.status==='Nueva').length;
+    $('#kpiNew').textContent = newCount;
+    $('#navNewCount').textContent = newCount;
+    renderNewPreview();
+  }
+
+  function renderNewPreview(){
+    const items = requests.filter(r=>r.status==='Nueva').slice(0,3);
+    $('#newRequestsPreview').innerHTML = items.map(r=>`
+      <div class="row-card">
+        <div><strong>${r.id}</strong><small>${r.client}</small></div>
+        <div><strong>${r.type}</strong><small>${r.dates}</small></div>
+        <div><span class="tag info">Nueva</span></div>
+        <div><small>Personas</small><strong>${r.people}</strong></div>
+        <button class="btn small" data-open-request="${r.id}">Revisar</button>
+      </div>`).join('') || '<div class="empty">No hay solicitudes nuevas.</div>';
+  }
+
+  function setPage(page){
+    $$('.page').forEach(p=>p.classList.remove('active'));
+    const target = $(`#page-${page}`) || $('#page-placeholder');
+    target.classList.add('active');
+    $$('.nav button[data-page]').forEach(b=>b.classList.toggle('active', b.dataset.page===page));
+    $('#sidebar').classList.remove('open');
+  }
+
+  function openRequest(id){
+    currentRequest = requests.find(r=>r.id===id) || requests[0];
+    if(!currentRequest) return;
+    $('#detailId').textContent = currentRequest.id;
+    $('#detailMeta').textContent = `${currentRequest.client} · ${currentRequest.type} · ${currentRequest.dates} · ${currentRequest.people} personas · Responsable: ${currentRequest.owner}`;
+    $('#detailStatus').textContent = currentRequest.status;
+    $('#detailClient').textContent = currentRequest.client;
+    $('#detailDates').textContent = currentRequest.dates;
+    $('#detailPeople').textContent = currentRequest.people;
+    $('#originalBlocks').innerHTML = currentRequest.blocks.map(([title,text])=>`<article class="service-card"><h3>${title}</h3><p>${text}</p><span class="tag info">Solicitado por cliente</span></article>`).join('');
+    updateRequestMode();
+    $('#requestDetail').classList.add('open');
+    switchTab('solicitud');
+  }
+
+  function updateRequestMode(){
+    const isNew = currentRequest.status === 'Nueva';
+    const isProcessing = currentRequest.status === 'En trámite';
+    const isCancelled = currentRequest.status === 'Cancelada';
+
+    $('#cancelRequest').hidden = !isNew;
+    $('#processRequest').hidden = !isNew;
+
+    const notice = $('#detailStatusNotice');
+    if(isNew){
+      notice.className='notice';
+      notice.textContent='Solicitud recibida. Reservas debe decidir si Cancelar o Tramitar.';
+    } else if(isProcessing){
+      notice.className='notice warning';
+      notice.textContent='Expediente En trámite. Ya puede iniciarse la revisión interna y preparar una propuesta.';
+    } else if(isCancelled){
+      notice.className='notice danger';
+      notice.textContent='Solicitud cancelada por falta de disponibilidad. El envío real del correo se integrará en una fase posterior.';
+    }
+
+    $('#reviewContent').innerHTML = isProcessing ? `
+      <div class="service-grid">
+        ${currentRequest.blocks.map(([title,text])=>`
+          <article class="service-card"><h3>${title}</h3><p>${text}</p><div class="service-status"><button class="btn small">Disponible</button><button class="btn small">No disponible</button><button class="btn small">Proponer alternativa</button></div></article>`).join('')}
+      </div>
+      <div style="margin-top:14px"><button class="btn primary">Preparar propuesta al cliente</button></div>` :
+      '<div class="empty">Pulsa “Tramitar” para abrir la revisión del expediente.</div>';
+  }
+
+  function switchTab(tab){
+    $$('#detailTabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+    $$('.tab-panel').forEach(p=>p.classList.remove('active'));
+    $(`#tab-${tab}`).classList.add('active');
+  }
+
+  function updateRole(){
+    const role = $('#roleSelect').value;
+    $('#reservasNav').hidden = role !== 'reservas';
+    $('#adminNav').hidden = role !== 'administrador';
+    $('#contentNav').hidden = role !== 'contenidos';
+    if(role === 'reservas'){
+      setPage('inicio');
+    } else {
+      $('#placeholderTitle').textContent = role === 'administrador' ? 'Administrador' : 'Gestión de contenidos';
+      setPage('placeholder');
+    }
+  }
+
+  document.addEventListener('click', e=>{
+    const pageBtn = e.target.closest('[data-page]');
+    if(pageBtn) setPage(pageBtn.dataset.page);
+    const jump = e.target.closest('[data-page-jump]');
+    if(jump) setPage(jump.dataset.pageJump);
+    const open = e.target.closest('[data-open-request]');
+    if(open) openRequest(open.dataset.openRequest);
+    const placeholder = e.target.closest('[data-placeholder]');
+    if(placeholder){ $('#placeholderTitle').textContent=placeholder.dataset.placeholder; setPage('placeholder'); }
+  });
+
+  $('#menuToggle').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
+  $('#roleSelect').addEventListener('change', updateRole);
+  $('#globalSearch').addEventListener('input', renderRequests);
+  $('#closeDetail').addEventListener('click',()=>$('#requestDetail').classList.remove('open'));
+
+  $('#requestFilters').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-filter]'); if(!btn) return;
+    activeFilter=btn.dataset.filter;
+    $$('#requestFilters [data-filter]').forEach(b=>b.classList.toggle('active',b===btn));
+    renderRequests();
+  });
+
+  $('#detailTabs').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-tab]'); if(btn) switchTab(btn.dataset.tab);
+  });
+
+  $('#processRequest').addEventListener('click',()=>{
+    if(!currentRequest || currentRequest.status!=='Nueva') return;
+    currentRequest.status='En trámite';
+    currentRequest.owner='David';
+    $('#detailStatus').textContent=currentRequest.status;
+    $('#detailMeta').textContent = `${currentRequest.client} · ${currentRequest.type} · ${currentRequest.dates} · ${currentRequest.people} personas · Responsable: ${currentRequest.owner}`;
+    updateRequestMode();
+    renderRequests();
+    switchTab('revision');
+    toast(`${currentRequest.id} pasa a En trámite.`);
+  });
+
+  $('#cancelRequest').addEventListener('click',()=>$('#cancelDialog').showModal());
+  $('#cancelDialogBack').addEventListener('click',()=>$('#cancelDialog').close());
+  $('#confirmCancel').addEventListener('click',()=>{
+    if(!currentRequest) return;
+    currentRequest.status='Cancelada';
+    $('#detailStatus').textContent='Cancelada';
+    updateRequestMode();
+    renderRequests();
+    $('#cancelDialog').close();
+    toast('Solicitud cancelada. Email automático simulado en esta V1.');
+  });
+
+  $('#pdfBtn').addEventListener('click',()=>toast('Exportación PDF prevista: se implementará en una iteración posterior.'));
+  $('#excelBtn').addEventListener('click',()=>toast('Exportación Excel prevista: se implementará en una iteración posterior.'));
+
+  renderRequests();
+  updateRole();
+</script>
+</body>
+</html>
