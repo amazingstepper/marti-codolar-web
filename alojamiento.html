@@ -21,29 +21,23 @@
 .room-row .btn.secondary[type="button"]{white-space:nowrap}
 .form-note.error{color:#c0202e}
 .form-note.success{color:#2f7d4f}
-.nights-summary{
-  margin-top:14px;
-  padding:14px 16px;
-  border:1px solid #ded6cf;
-  border-radius:12px;
-  background:#fff;
-  font-size:1rem;
-  color:#252525;
-}
-.nights-summary strong{color:#9b1c31;font-size:1.08rem}
-.service-choice-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:12px}
-.service-choice{display:flex;gap:9px;align-items:flex-start;padding:14px;border:1px solid #ded6cf;border-radius:12px;background:#fff;font-weight:700}
-.conditional-subform{margin-top:18px;padding:18px;border:1px solid #ded6cf;border-radius:14px;background:#fff}
-.service-day{padding:14px 0;border-top:1px solid #eee7e1}
+ 
+.nights-highlight{margin-top:16px;padding:16px 18px;border:1px solid #d8d0c8;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.nights-highlight .nights-label{font-size:1rem;font-weight:600;color:#555}
+.nights-highlight strong{font-size:1.18rem;line-height:1.3;color:#9b1c31}
+.services-panel{margin-top:30px}
+.service-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.service-choice{display:flex;gap:10px;align-items:flex-start;padding:16px;border:1px solid #d8d0c8;border-radius:12px;background:#fff;font-weight:700;cursor:pointer}
+.service-choice input{margin-top:3px}
+.conditional-subform{margin-top:16px;padding:18px;border:1px solid #d8d0c8;border-radius:12px;background:#fff}
+.service-day{padding:14px 0;border-top:1px solid #ece6e0}
 .service-day:first-child{border-top:0}
-.service-day h4{margin:0 0 10px}
-.service-options{display:flex;gap:16px;flex-wrap:wrap}
-.service-option{display:flex;gap:7px;align-items:center;font-weight:600}
-.breakfast-picnic-row{display:grid;grid-template-columns:minmax(170px,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid #eee7e1}
-.breakfast-picnic-row:first-child{border-top:0}
-.breakfast-picnic-row strong{display:block}
-.breakfast-picnic-row small{display:block;color:#666}
-@media(max-width:600px){.breakfast-picnic-row{grid-template-columns:1fr}}
+.service-day h4{margin:0 0 10px;text-transform:capitalize}
+.service-line{display:grid;grid-template-columns:minmax(150px,1fr) 150px;gap:12px;align-items:center;margin-top:10px}
+.service-line label{display:flex;align-items:center;gap:8px;font-weight:600}
+.service-line input[type=number]{width:100%}
+@media(max-width:650px){.service-choice-grid{grid-template-columns:1fr}.service-line{grid-template-columns:1fr}}
+
 </style>
 </head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
@@ -75,14 +69,14 @@
     <div class="field-error">Indica la fecha de salida (posterior a la de llegada).</div>
   </div>
 </div>
-<div class="nights-summary" id="nightsInfoWrap">
-  <span id="nightsInfo" aria-live="polite">Selecciona las fechas para ver el número total de noches.</span>
+<div class="nights-highlight" id="nightsInfoWrap">
+  <span class="nights-label">Duración de la estancia</span>
+  <strong id="nightsInfo" aria-live="polite">Selecciona las fechas para calcular las noches.</strong>
 </div>
 
 <div style="margin-top:28px">
   <h3>Habitaciones solicitadas</h3>
   <p class="form-note">Puedes combinar diferentes tipos de habitación. Ejemplo: 2 dobles + 1 individual = 5 personas.</p>
-<p class="form-note" id="stockInfo" aria-live="polite"></p>
 
   <div id="roomRows" class="form-grid">
     <div class="form-grid two room-row">
@@ -139,29 +133,35 @@
     <input type="text" name="Régimen" value="Alojamiento con desayuno incluido" readonly aria-readonly="true">
     <small>Todas las habitaciones se reservan con desayuno incluido. No se ofrecen opciones de solo alojamiento, media pensión ni pensión completa.</small>
   </div>
-
 </div>
 
-<div style="margin-top:28px">
+<div class="services-panel">
   <h3>Servicios durante la estancia</h3>
-  <p class="form-note">El desayuno está incluido. Si lo necesitas, puedes solicitar comidas, cenas o cambiar algún desayuno por un picnic.</p>
+  <p class="form-note">El desayuno está incluido. Si lo necesitas, puedes solicitar comidas, cenas o sustituir algún desayuno por un picnic.</p>
+
   <div class="service-choice-grid">
-    <label class="service-choice"><input id="mealsCheckbox" type="checkbox"> <span>Comidas y/o cenas</span></label>
-    <label class="service-choice"><input id="breakfastPicnicCheckbox" type="checkbox"> <span>Picnic de desayuno</span></label>
+    <label class="service-choice">
+      <input id="mealsCheckbox" type="checkbox">
+      <span>Comidas y/o cenas</span>
+    </label>
+    <label class="service-choice">
+      <input id="breakfastPicnicCheckbox" type="checkbox">
+      <span>Picnic de desayuno</span>
+    </label>
+  </div>
+
+  <div id="mealsSection" class="conditional-subform" hidden>
+    <h3 style="margin-top:0">Comidas y cenas</h3>
+    <p class="form-note">Llegada: cena. Días intermedios: comida y cena. Salida: comida. Puedes indicar cuántas personas necesitan cada servicio.</p>
+    <div id="mealsDays"></div>
+  </div>
+
+  <div id="breakfastPicnicSection" class="conditional-subform" hidden>
+    <h3 style="margin-top:0">Picnic de desayuno</h3>
+    <p class="form-note">El desayuno está incluido. Marca solo los días en que quieras sustituirlo por picnic e indica para cuántas personas.</p>
+    <div id="breakfastDays"></div>
   </div>
 </div>
-
-<div id="mealsSection" class="conditional-subform" hidden>
-  <h3 style="margin-top:0">Comidas y cenas durante la estancia</h3>
-  <p class="form-note">Selecciona los servicios que necesitas cada día. El día de llegada solo puede solicitarse cena; los días intermedios, comida y cena; y el día de salida, comida.</p>
-  <div id="mealsDays"></div>
-</div>
-
-<div id="breakfastPicnicSection" class="conditional-subform" hidden>
-  <h3 style="margin-top:0">Desayuno picnic</h3>
-  <p class="form-note">El desayuno está incluido en el alojamiento. Marca únicamente los días en los que quieres sustituirlo por un desayuno picnic.</p>
-  <div id="breakfastDays"></div>
-
 
 <div class="form-grid" style="margin-top:28px">
   <h3>Datos del solicitante</h3>
@@ -239,8 +239,7 @@ function enforceRoomStock(){
       qty.max=1; qty.disabled=false;
     }
   });
-  const used=poolUsage(), info=document.getElementById('stockInfo');
-  if(info) info.textContent=`Stock restante: ${ROOM_STOCK.singleDouble-used.singleDouble} habitaciones del conjunto Individual/Doble y ${ROOM_STOCK.tripleQuad-used.tripleQuad} del conjunto Triple/Cuádruple.`;
+
 }
 
 
@@ -351,8 +350,8 @@ function updateNightsInfo(){
   const a = new Date(arrival + 'T00:00:00');
   const d = new Date(departure + 'T00:00:00');
   const nights = Math.round((d - a) / 86400000);
-  info.innerHTML = nights > 0
-    ? `<strong>Total de noches: ${nights}</strong>`
+  info.textContent = nights > 0
+    ? `Total de noches: ${nights}`
     : 'La fecha de salida debe ser posterior a la fecha de llegada.';
 }
 
@@ -360,70 +359,107 @@ document.getElementById('fechaLlegada').addEventListener('change', updateNightsI
 document.getElementById('fechaSalida').addEventListener('change', updateNightsInfo);
 
 
-function dateObj(value){ return new Date(value + 'T12:00:00'); }
-function dateKey(d){
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function serviceDate(value){
+  return new Date(value + 'T12:00:00');
 }
-function prettyDate(d){
-  return new Intl.DateTimeFormat('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(d);
+function serviceDateKey(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-function stayDatesInclusive(){
-  const a=document.getElementById('fechaLlegada').value, b=document.getElementById('fechaSalida').value;
+function servicePrettyDate(d){
+  return new Intl.DateTimeFormat('es-ES',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
+}
+function stayDaysInclusive(){
+  const a=document.getElementById('fechaLlegada').value;
+  const b=document.getElementById('fechaSalida').value;
   if(!a||!b) return [];
-  const start=dateObj(a), end=dateObj(b);
+  const start=serviceDate(a), end=serviceDate(b);
   if(end<=start) return [];
-  const out=[], d=new Date(start);
-  while(d<=end){out.push(new Date(d)); d.setDate(d.getDate()+1);}
-  return out;
+  const days=[];
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)) days.push(new Date(d));
+  return days;
 }
-function generateMeals(){
+function maxGuests(){
+  return Math.max(parseInt(document.getElementById('totalPeople').value||'0',10),1);
+}
+function mealLine(label,key){
+  return `<div class="service-line">
+    <label><input type="checkbox" class="meal-request" data-label="${label}" data-date="${key}"> ${label}</label>
+    <input type="number" class="meal-people" min="1" max="${maxGuests()}" value="${maxGuests()}" aria-label="Personas para ${label}" disabled>
+  </div>`;
+}
+function bindServiceNumbers(root){
+  root.querySelectorAll('.service-line').forEach(line=>{
+    const check=line.querySelector('input[type=checkbox]');
+    const num=line.querySelector('input[type=number]');
+    check.addEventListener('change',()=>{num.disabled=!check.checked; if(check.checked) num.value=maxGuests();});
+    num.addEventListener('input',()=>{const m=maxGuests(); num.max=m; if(+num.value>m) num.value=m; if(+num.value<1) num.value=1;});
+    num.addEventListener('wheel',e=>e.currentTarget.blur(),{passive:true});
+  });
+}
+function renderMeals(){
   const section=document.getElementById('mealsSection'), box=document.getElementById('mealsDays');
   if(!document.getElementById('mealsCheckbox').checked){section.hidden=true;box.innerHTML='';return;}
   section.hidden=false; box.innerHTML='';
-  const dates=stayDatesInclusive();
-  if(!dates.length){box.innerHTML='<p class="form-note">Indica primero las fechas de llegada y salida.</p>';return;}
-  dates.forEach((d,i)=>{
-    const arrival=i===0, departure=i===dates.length-1, key=dateKey(d);
-    const day=document.createElement('div'); day.className='service-day';
-    let opts='';
-    if(!arrival) opts += `<label class="service-option"><input type="checkbox" class="meal-request" data-label="Comida" data-date="${key}"> Comida</label>`;
-    if(!departure) opts += `<label class="service-option"><input type="checkbox" class="meal-request" data-label="Cena" data-date="${key}"> Cena</label>`;
-    day.innerHTML=`<h4>${prettyDate(d)}</h4><div class="service-options">${opts}</div>`;
-    box.appendChild(day);
+  const days=stayDaysInclusive();
+  if(!days.length){box.innerHTML='<p class="form-note">Indica primero unas fechas de llegada y salida válidas.</p>';return;}
+  days.forEach((d,i)=>{
+    const key=serviceDateKey(d), first=i===0, last=i===days.length-1;
+    const el=document.createElement('div'); el.className='service-day';
+    let lines='';
+    if(!first) lines+=mealLine('Comida',key);
+    if(!last) lines+=mealLine('Cena',key);
+    el.innerHTML=`<h4>${servicePrettyDate(d)}</h4>${lines}`;
+    box.appendChild(el);
   });
+  bindServiceNumbers(box);
 }
-function generateBreakfastPicnic(){
+function renderBreakfastPicnic(){
   const section=document.getElementById('breakfastPicnicSection'), box=document.getElementById('breakfastDays');
   if(!document.getElementById('breakfastPicnicCheckbox').checked){section.hidden=true;box.innerHTML='';return;}
   section.hidden=false; box.innerHTML='';
-  const dates=stayDatesInclusive().slice(1);
-  if(!dates.length){box.innerHTML='<p class="form-note">Indica primero una estancia con al menos una noche.</p>';return;}
-  dates.forEach(d=>{
-    const key=dateKey(d), row=document.createElement('div'); row.className='breakfast-picnic-row';
-    row.innerHTML=`<div><strong>${prettyDate(d)}</strong><small>Desayuno incluido</small></div>
-      <label class="service-option"><input type="checkbox" class="breakfast-picnic-request" data-date="${key}"> Solicitar picnic</label>`;
-    box.appendChild(row);
+  const days=stayDaysInclusive().slice(1);
+  if(!days.length){box.innerHTML='<p class="form-note">Indica primero una estancia de al menos una noche.</p>';return;}
+  days.forEach(d=>{
+    const key=serviceDateKey(d), el=document.createElement('div'); el.className='service-day';
+    el.innerHTML=`<h4>${servicePrettyDate(d)}</h4>
+      <div class="service-line">
+        <label><input type="checkbox" class="breakfast-request" data-date="${key}"> Desayuno picnic</label>
+        <input type="number" class="breakfast-people" min="1" max="${maxGuests()}" value="${maxGuests()}" aria-label="Personas para desayuno picnic" disabled>
+      </div>`;
+    box.appendChild(el);
   });
+  bindServiceNumbers(box);
 }
-function refreshStayServices(){ updateNightsInfo(); generateMeals(); generateBreakfastPicnic(); }
-document.getElementById('mealsCheckbox').addEventListener('change',generateMeals);
-document.getElementById('breakfastPicnicCheckbox').addEventListener('change',generateBreakfastPicnic);
-document.getElementById('fechaLlegada').addEventListener('change',refreshStayServices);
-document.getElementById('fechaSalida').addEventListener('change',refreshStayServices);
+function refreshServices(){
+  renderMeals();
+  renderBreakfastPicnic();
+}
+document.getElementById('mealsCheckbox').addEventListener('change',renderMeals);
+document.getElementById('breakfastPicnicCheckbox').addEventListener('change',renderBreakfastPicnic);
+document.getElementById('fechaLlegada').addEventListener('change',refreshServices);
+document.getElementById('fechaSalida').addEventListener('change',refreshServices);
+document.getElementById('roomRows').addEventListener('input',()=>{ if(document.getElementById('mealsCheckbox').checked||document.getElementById('breakfastPicnicCheckbox').checked) refreshServices(); });
 
-function getMealsText(){
-  const selected=[...document.querySelectorAll('.meal-request:checked')];
-  if(!selected.length) return 'No solicita comidas ni cenas adicionales.';
-  return selected.map(x=>`${x.dataset.label} · ${formatDateESGlobal(x.dataset.date)}`).join('\n');
+function selectedMealsText(){
+  const rows=[...document.querySelectorAll('.meal-request:checked')];
+  if(!rows.length) return 'No solicita comidas ni cenas.';
+  return rows.map(c=>{
+    const n=c.closest('.service-line').querySelector('.meal-people').value;
+    return `${formatDateESGlobal(c.dataset.date)} · ${c.dataset.label} · ${n} persona${n==='1'?'':'s'}`;
+  }).join('\n');
 }
-function getBreakfastPicnicText(){
-  const selected=[...document.querySelectorAll('.breakfast-picnic-request:checked')];
-  if(!selected.length) return 'No solicita desayunos picnic.';
-  return selected.map(x=>`Desayuno picnic · ${formatDateESGlobal(x.dataset.date)}`).join('\n');
+function selectedBreakfastText(){
+  const rows=[...document.querySelectorAll('.breakfast-request:checked')];
+  if(!rows.length) return 'No solicita desayunos picnic.';
+  return rows.map(c=>{
+    const n=c.closest('.service-line').querySelector('.breakfast-people').value;
+    return `${formatDateESGlobal(c.dataset.date)} · Desayuno picnic · ${n} persona${n==='1'?'':'s'}`;
+  }).join('\n');
 }
 function formatDateESGlobal(value){
   if(!value) return '';
-  const [y,m,d]=value.split('-'); return `${d}/${m}/${y}`;
+  const [y,m,d]=value.split('-');
+  return `${d}/${m}/${y}`;
 }
 
 function markError(field, hasError){
@@ -570,10 +606,10 @@ Régimen: ${regimen}`);
 
     payload.append('03 · RESTAURACIÓN',
 `COMIDAS Y CENAS
-${getMealsText()}
+${selectedMealsText()}
 
-DESAYUNO PICNIC
-${getBreakfastPicnicText()}`);
+PICNIC DE DESAYUNO
+${selectedBreakfastText()}`);
 
     payload.append('04 · DATOS DE CONTACTO',
 `Nombre: ${nombre}
