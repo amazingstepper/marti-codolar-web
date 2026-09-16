@@ -50,6 +50,89 @@
 .service-line input[type="number"]:disabled{background:#f5f3f1;color:#777;opacity:1;cursor:not-allowed}
 @media(max-width:650px){.service-line{grid-template-columns:1fr}.service-line input[type="number"]{max-width:180px}}
 
+
+/* V6 · Desayunos/picnic con la misma estructura visual que Grupos */
+.breakfast-group-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:24px;
+  align-items:center;
+  padding:16px 0;
+  border-top:1px solid #ece6e0;
+}
+.breakfast-group-row:first-child{border-top:0}
+.breakfast-group-row h4{
+  margin:0 0 4px;
+  font-size:1rem;
+  line-height:1.35;
+  text-transform:none;
+}
+.breakfast-group-row .included{
+  display:block;
+  color:#6b6b6b;
+  font-size:.9rem;
+}
+.breakfast-controls{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  white-space:nowrap;
+}
+.breakfast-controls .people-label{font-size:1rem;color:#444}
+.breakfast-controls input[type="number"]{
+  width:68px;
+  min-height:44px;
+  padding:8px 10px;
+  border:1px solid #d8d0c8;
+  border-radius:4px;
+  background:#fff;
+  color:#252525;
+  font:inherit;
+  box-sizing:border-box;
+}
+.breakfast-controls input[type="number"]:disabled{
+  background:#f5f3f1;
+  color:#777;
+  opacity:1;
+}
+.picnic-switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.picnic-switch input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.picnic-toggle{
+  position:relative;
+  width:39px;
+  height:22px;
+  border-radius:999px;
+  background:#d8d4d0;
+  transition:background .2s ease;
+  flex:0 0 auto;
+}
+.picnic-toggle::after{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  top:2px;
+  left:2px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+  transition:transform .2s ease;
+}
+.picnic-switch input:checked + .picnic-toggle{background:#9b1c31}
+.picnic-switch input:checked + .picnic-toggle::after{transform:translateX(17px)}
+.picnic-switch input:focus-visible + .picnic-toggle{
+  outline:2px solid #9b1c31;
+  outline-offset:3px;
+}
+@media(max-width:650px){
+  .breakfast-group-row{grid-template-columns:1fr;gap:10px}
+  .breakfast-controls{justify-content:flex-start;flex-wrap:wrap}
+}
+
 </style>
 </head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
@@ -169,8 +252,8 @@
   </div>
 
   <div id="breakfastPicnicSection" class="conditional-subform" hidden>
-    <h3 style="margin-top:0">Picnic de desayuno</h3>
-    <p class="form-note">El desayuno está incluido. Marca solo los días en que quieras sustituirlo por picnic e indica para cuántas personas.</p>
+    <h3 style="margin-top:0">Desayunos durante la estancia</h3>
+    <p class="form-note">El desayuno está incluido en el alojamiento. Marca únicamente las fechas en las que necesitas desayunos picnic e indica para cuántas personas.</p>
     <div id="breakfastDays"></div>
   </div>
 </div>
@@ -442,16 +525,54 @@ function renderBreakfastPicnic(){
   section.hidden=false; box.innerHTML='';
   const days=stayDaysInclusive().slice(1);
   if(!days.length){box.innerHTML='<p class="form-note">Indica primero una estancia de al menos una noche.</p>';return;}
+
   days.forEach(d=>{
-    const key=serviceDateKey(d), el=document.createElement('div'); el.className='service-day';
-    el.innerHTML=`<h4>${servicePrettyDate(d)}</h4>
-      <div class="service-line">
-        <label><input type="checkbox" class="breakfast-request" data-date="${key}"> Desayuno picnic</label>
+    const key=serviceDateKey(d), row=document.createElement('div');
+    row.className='breakfast-group-row';
+    row.innerHTML=`
+      <div>
+        <h4>${servicePrettyDate(d)}</h4>
+        <span class="included">Desayuno incluido</span>
+      </div>
+      <div class="breakfast-controls">
+        <label class="picnic-switch">
+          <span>Picnic</span>
+          <input type="checkbox" class="breakfast-request" data-date="${key}" aria-label="Solicitar desayuno picnic para ${servicePrettyDate(d)}">
+          <span class="picnic-toggle" aria-hidden="true"></span>
+        </label>
+        <span class="people-label">Personas</span>
         <input type="number" class="breakfast-people" min="1" max="${maxGuests()}" value="${maxGuests()}" aria-label="Personas para desayuno picnic" disabled>
       </div>`;
-    box.appendChild(el);
+    box.appendChild(row);
+
+    const check=row.querySelector('.breakfast-request');
+    const num=row.querySelector('.breakfast-people');
+
+    check.addEventListener('change',()=>{
+      num.disabled=!check.checked;
+      if(check.checked) num.value=maxGuests();
+    });
+
+    num.addEventListener('input',()=>{
+      const maximum=maxGuests();
+      num.max=maximum;
+      if(+num.value>maximum) num.value=maximum;
+      if(+num.value<1) num.value=1;
+    });
+
+    num.addEventListener('wheel', e=>{
+      if(document.activeElement===num){
+        e.preventDefault();
+        num.blur();
+        window.scrollBy({top:e.deltaY,left:e.deltaX,behavior:'auto'});
+      }
+    }, {passive:false});
+
+    num.addEventListener('dblclick',()=>{
+      num.focus();
+      num.select();
+    });
   });
-  bindServiceNumbers(box);
 }
 function refreshServices(){
   renderMeals();
@@ -475,7 +596,7 @@ function selectedBreakfastText(){
   const rows=[...document.querySelectorAll('.breakfast-request:checked')];
   if(!rows.length) return 'No solicita desayunos picnic.';
   return rows.map(c=>{
-    const n=c.closest('.service-line').querySelector('.breakfast-people').value;
+    const n=c.closest('.breakfast-group-row').querySelector('.breakfast-people').value;
     return `${formatDateESGlobal(c.dataset.date)} · Desayuno picnic · ${n} persona${n==='1'?'':'s'}`;
   }).join('\n');
 }
