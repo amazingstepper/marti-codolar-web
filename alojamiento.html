@@ -38,6 +38,18 @@
 .service-line input[type=number]{width:100%}
 @media(max-width:650px){.service-choice-grid{grid-template-columns:1fr}.service-line{grid-template-columns:1fr}}
 
+
+/* V5 · Ajustes de coherencia visual del formulario */
+.form-grid.two.align-fields{align-items:start}
+.align-fields > .field{display:flex;flex-direction:column;height:100%}
+.align-fields > .field > input,.align-fields > .field > select{min-height:64px}
+.align-fields > .field > small{display:block;min-height:42px;margin-top:7px;line-height:1.45}
+.service-line{grid-template-columns:minmax(180px,1fr) 132px;gap:18px}
+.service-line input[type="number"]{width:100%;min-height:48px;padding:10px 12px;border:1px solid #d8d0c8;border-radius:10px;background:#fff;color:#252525;font:inherit;font-size:1rem;line-height:1.2;box-sizing:border-box;appearance:auto;-moz-appearance:auto}
+.service-line input[type="number"]:focus{outline:2px solid rgba(155,28,49,.18);outline-offset:1px;border-color:#9b1c31}
+.service-line input[type="number"]:disabled{background:#f5f3f1;color:#777;opacity:1;cursor:not-allowed}
+@media(max-width:650px){.service-line{grid-template-columns:1fr}.service-line input[type="number"]{max-width:180px}}
+
 </style>
 </head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
@@ -52,7 +64,7 @@
 <section id="solicitud" class="soft"><div class="container form-wrap"><div class="form-panel">
 <div class="eyebrow" style="color:#9b1c31">Solicitud de alojamiento</div>
 <h2>Consulta disponibilidad</h2>
-<p class="lead">Indica las habitaciones que necesitas. El total de personas se calcula automáticamente según el tipo y la cantidad de habitaciones para facilitar la comprobación de la solicitud. Este formulario admite solicitudes de hasta <strong>10 personas</strong>; a partir de 11 personas, la estancia se gestiona como grupo.</p>
+
 
 <form id="accommodationForm" name="solicitud-alojamiento" method="POST" onsubmit="return submitAccommodation(event)" novalidate>
 <input type="hidden" id="roomSummary" name="Habitaciones solicitadas">
@@ -116,7 +128,7 @@
   </div>
 </div>
 
-<div class="form-grid two" style="margin-top:28px">
+<div class="form-grid two align-fields" style="margin-top:28px">
   <div class="field">
     <label for="motivo">Motivo de la estancia</label>
     <select id="motivo" name="Motivo de la estancia" required>
@@ -310,7 +322,11 @@ function applyCapacityState(total){
 function bindRoomRow(row){
   row.querySelector('.room-type').addEventListener('change', updateTotalPeople);
   row.querySelector('.room-qty').addEventListener('input', updateTotalPeople);
-  row.querySelector('.room-qty').addEventListener('wheel', e => e.currentTarget.blur(), {passive:true});
+  const qtyInput = row.querySelector('.room-qty');
+  qtyInput.addEventListener('wheel', e => {
+    if(document.activeElement === qtyInput){ e.preventDefault(); qtyInput.blur(); window.scrollBy({top:e.deltaY,left:e.deltaX,behavior:'auto'}); }
+  }, {passive:false});
+  qtyInput.addEventListener('dblclick', () => { qtyInput.focus(); qtyInput.select(); });
 }
 
 function addRoomRow(){
@@ -393,7 +409,14 @@ function bindServiceNumbers(root){
     const num=line.querySelector('input[type=number]');
     check.addEventListener('change',()=>{num.disabled=!check.checked; if(check.checked) num.value=maxGuests();});
     num.addEventListener('input',()=>{const m=maxGuests(); num.max=m; if(+num.value>m) num.value=m; if(+num.value<1) num.value=1;});
-    num.addEventListener('wheel',e=>e.currentTarget.blur(),{passive:true});
+    num.addEventListener('wheel', e => {
+      if(document.activeElement === num){
+        e.preventDefault();
+        num.blur();
+        window.scrollBy({top:e.deltaY,left:e.deltaX,behavior:'auto'});
+      }
+    }, {passive:false});
+    num.addEventListener('dblclick', () => { num.focus(); num.select(); });
   });
 }
 function renderMeals(){
