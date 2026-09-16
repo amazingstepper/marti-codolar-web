@@ -577,6 +577,23 @@ function addRoomRow(){
   updateTotalPeople();
 }
 
+
+function localISODate(date=new Date()){
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,'0');
+  const d=String(date.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+function applyDateMinimums(){
+  const arrival=document.getElementById('fechaLlegada');
+  const departure=document.getElementById('fechaSalida');
+  const today=localISODate();
+  arrival.min=today;
+  departure.min=arrival.value && arrival.value>=today ? arrival.value : today;
+
+  if(arrival.value && arrival.value<today) arrival.value='';
+  if(departure.value && departure.value<departure.min) departure.value='';
+}
 function updateNightsInfo(){
   const arrival = document.getElementById('fechaLlegada').value;
   const departure = document.getElementById('fechaSalida').value;
@@ -757,8 +774,8 @@ function refreshServices(){
 }
 document.getElementById('mealsCheckbox').addEventListener('change',()=>{renderMeals();refreshSummaryAfterEdit();});
 document.getElementById('breakfastPicnicCheckbox').addEventListener('change',()=>{renderBreakfastPicnic();refreshSummaryAfterEdit();});
-document.getElementById('fechaLlegada').addEventListener('change',refreshServices);
-document.getElementById('fechaSalida').addEventListener('change',refreshServices);
+document.getElementById('fechaLlegada').addEventListener('change',()=>{applyDateMinimums();refreshServices();refreshSummaryAfterEdit();});
+document.getElementById('fechaSalida').addEventListener('change',()=>{applyDateMinimums();refreshServices();refreshSummaryAfterEdit();});
 document.getElementById('roomRows').addEventListener('input',()=>{ if(document.getElementById('mealsCheckbox').checked||document.getElementById('breakfastPicnicCheckbox').checked) refreshServices(); });
 
 function selectedMealsText(){
@@ -800,32 +817,54 @@ function summaryNights(){
 }
 function roomSummaryHtml(){
   const items=[];
-  document.querySelectorAll('.room-row').forEach(row=>{
-    const select=row.querySelector('.room-type'),qty=parseInt(row.querySelector('.room-qty').value||'0',10);
-    if(select.value&&qty>0) items.push(`<li><strong>${qty} × ${escapeSummaryHtml(select.options[select.selectedIndex].text)}</strong></li>`);
+  document.querySelectorAll('#roomRows .room-row').forEach(row=>{
+    const select=row.querySelector('select.room-type, select');
+    const qty=row.querySelector('input.room-qty, input[type="number"]');
+    const amount=qty ? parseInt(qty.value||'0',10) : 0;
+    if(select && select.value && amount>0){
+      items.push(`<li><strong>${amount} × ${escapeSummaryHtml(select.options[select.selectedIndex].text)}</strong></li>`);
+    }
   });
-  return items.length?`<ul class="summary-list">${items.join('')}</ul>`:'<p class="summary-empty">No se han indicado habitaciones.</p>';
+  return items.length ? `<ul class="summary-list">${items.join('')}</ul>` : '<p class="summary-empty">No se han indicado habitaciones.</p>';
 }
 function mealsSummaryHtml(){
-  const selected=[...document.querySelectorAll('.meal-request:checked')];
-  if(!selected.length) return '<p class="summary-empty">No se han solicitado comidas ni cenas.</p>';
-  return `<ul class="summary-list">${selected.map(c=>{
-    const n=c.closest('.meal-choice-row').querySelector('.meal-people').value;
-    return `<li>${escapeSummaryHtml(formatDateESGlobal(c.dataset.date))}: <strong>${escapeSummaryHtml(c.dataset.label)} · ${escapeSummaryHtml(n)} persona${n==='1'?'':'s'}</strong></li>`;
-  }).join('')}</ul>`;
+  const items=[];
+  document.querySelectorAll('#mealsDays input[data-date][data-label]').forEach(toggle=>{
+    if(!toggle.checked) return;
+    const row=toggle.closest('.meal-choice-row, .meal-service-row, .service-line') || toggle.parentElement.parentElement;
+    const people=row ? row.querySelector('input[type="number"]') : null;
+    const n=people ? String(people.value||'0') : '0';
+    items.push(`<li>${escapeSummaryHtml(formatDateESGlobal(toggle.dataset.date))}: <strong>${escapeSummaryHtml(toggle.dataset.label)} · ${escapeSummaryHtml(n)} persona${n==='1'?'':'s'}</strong></li>`);
+  });
+  return items.length ? `<ul class="summary-list">${items.join('')}</ul>` : '<p class="summary-empty">No se han solicitado comidas ni cenas.</p>';
 }
 function breakfastSummaryHtml(){
-  const selected=[...document.querySelectorAll('.breakfast-request:checked')];
-  if(!selected.length) return '<p class="summary-empty">No se han solicitado desayunos picnic.</p>';
-  return `<ul class="summary-list">${selected.map(c=>{
-    const n=c.closest('.breakfast-group-row').querySelector('.breakfast-people').value;
-    return `<li>${escapeSummaryHtml(formatDateESGlobal(c.dataset.date))}: <strong>${escapeSummaryHtml(n)} desayuno${n==='1'?'':'s'} picnic</strong></li>`;
-  }).join('')}</ul>`;
+  const items=[];
+  document.querySelectorAll('#breakfastDays input[data-date]').forEach(toggle=>{
+    if(!toggle.checked) return;
+    const row=toggle.closest('.breakfast-group-row, .service-day') || toggle.parentElement.parentElement;
+    const people=row ? row.querySelector('input[type="number"]') : null;
+    const n=people ? String(people.value||'0') : '0';
+    items.push(`<li>${escapeSummaryHtml(formatDateESGlobal(toggle.dataset.date))}: <strong>${escapeSummaryHtml(n)} desayuno${n==='1'?'':'s'} picnic</strong></li>`);
+  });
+  return items.length ? `<ul class="summary-list">${items.join('')}</ul>` : '<p class="summary-empty">No se han solicitado desayunos picnic.</p>';
 }
 
 function fieldValue(id,name){
-  const el=(id ? document.getElementById(id) : null) || (name ? document.querySelector(`[name="${name}"]`) : null);
-  return el ? String(el.value || '').trim() : '';
+  const byId=id ? document.getElementById(id) : null;
+  if(byId) return String(byId.value||'').trim();
+
+  if(name){
+    const exact=document.querySelector(`[name="${name}"]`);
+    if(exact) return String(exact.value||'').trim();
+
+    const wanted=name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    for(const el of document.querySelectorAll('input[name],select[name],textarea[name]')){
+      const current=String(el.name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      if(current===wanted) return String(el.value||'').trim();
+    }
+  }
+  return '';
 }
 function updateFinalSummary(){
   const arrival=document.getElementById('fechaLlegada').value,departure=document.getElementById('fechaSalida').value;
@@ -873,6 +912,16 @@ function invalidateSummaryConfirmation(event){
   if(summaryConfirmation.checked) summaryConfirmation.checked=false;
   updateFinalSummary();
 }
+
+function handleAnyReservationEdit(event){
+  if(event.target===privacyCheckbox || event.target===summaryConfirmation) return;
+  if(summaryConfirmation.checked) summaryConfirmation.checked=false;
+  // Defer one tick so toggle handlers have already updated enabled fields/values.
+  queueMicrotask(()=>updateFinalSummary());
+}
+accommodationForm.addEventListener('input',handleAnyReservationEdit);
+accommodationForm.addEventListener('change',handleAnyReservationEdit);
+
 privacyCheckbox.addEventListener('change',()=>{
   document.getElementById('privacidadError').style.display='none';
   updateSummaryConfirmationState();
@@ -881,8 +930,7 @@ summaryConfirmation.addEventListener('change',()=>{
   document.getElementById('summaryConfirmationError').style.display='none';
   updateSummaryConfirmationState();
 });
-accommodationForm.addEventListener('input',invalidateSummaryConfirmation,true);
-accommodationForm.addEventListener('change',invalidateSummaryConfirmation,true);
+
 
 function markError(field, hasError){
   field.classList.toggle('has-error', hasError);
@@ -966,6 +1014,21 @@ async function submitAccommodation(e){
   if(total > MAX_PEOPLE){
     document.getElementById('groupAlert').classList.add('show');
     document.getElementById('groupAlert').scrollIntoView({behavior:'smooth', block:'center'});
+    return false;
+  }
+
+  applyDateMinimums();
+  const today=localISODate();
+  const arrivalValue=document.getElementById('fechaLlegada').value;
+  const departureValue=document.getElementById('fechaSalida').value;
+  if(!arrivalValue || arrivalValue<today){
+    resultEl.textContent='La fecha de llegada debe ser hoy o una fecha posterior.';
+    document.getElementById('fechaLlegada').focus();
+    return false;
+  }
+  if(!departureValue || departureValue<arrivalValue){
+    resultEl.textContent='La fecha de salida debe ser igual o posterior a la fecha de llegada.';
+    document.getElementById('fechaSalida').focus();
     return false;
   }
 
@@ -1075,6 +1138,7 @@ Email: ${email}`);
 }
 
 document.querySelectorAll('.room-row').forEach(bindRoomRow);
+applyDateMinimums();
 updateTotalPeople();
 updateFinalSummary();
 updateSummaryConfirmationState();
