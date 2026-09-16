@@ -231,6 +231,25 @@
 #mealsSection .meal-people:disabled{background:#f4f4f4!important;color:#777!important;opacity:1!important}
 @media(max-width:650px){#mealsSection .meal-choice-row{grid-template-columns:1fr;gap:8px}#mealsSection .breakfast-controls{justify-content:flex-start!important}}
 
+
+/* V10 · Resumen final y doble confirmación, igual que Grupos */
+.final-summary{margin-top:32px;border:2px solid #d8c7cb;border-radius:20px;background:#fff;overflow:hidden;transition:background-color .25s ease,border-color .25s ease}
+.final-summary-header{padding:20px;background:#fbf5f6;transition:background-color .25s ease,border-color .25s ease}
+.final-summary-header h3{margin:0 0 6px}
+.final-summary-body{padding:20px;background:#fff;transition:background-color .25s ease}
+.summary-section{padding:14px 0;border-top:1px solid #eee7e1}
+.summary-section:first-child{border-top:0}
+.summary-section h4{margin:0 0 7px;color:#9b1c31}
+.summary-list{margin:0;padding-left:20px}.summary-list li{margin:4px 0}
+.summary-empty{color:#777;font-style:italic}
+.summary-confirm{display:flex;align-items:flex-start;gap:10px;padding:18px 20px;border-top:1px solid #e0c5ca;background:#fbf5f6;transition:background-color .25s ease,border-color .25s ease}
+.summary-confirm input{margin-top:4px}
+.final-summary.confirmed{border-color:#bfd1bf;background:#eef5ee}
+.final-summary.confirmed .final-summary-header{background:#eef5ee;border-color:#bfd1bf}
+.final-summary.confirmed .final-summary-body{background:#f7faf7}
+.final-summary.confirmed .summary-section{border-color:#d6e4d6}
+.final-summary.confirmed .summary-confirm{background:#eef5ee;border-color:#bfd1bf}
+
 </style>
 </head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
@@ -381,13 +400,34 @@
   </div>
   <div class="field"><label>Observaciones</label><textarea name="Observaciones" placeholder="Cuéntanos cualquier necesidad relevante."></textarea></div>
 
-  <label class="consent">
-    <input type="checkbox" name="Privacidad aceptada" value="Sí" required id="privacidad">
-    <span>He leído la información sobre las condiciones de alojamiento y acepto la política de privacidad. <small>(Texto legal provisional.)</small></span>
-  </label>
-  <div class="field-error" id="privacidadError">Debes aceptar la política de privacidad para continuar.</div>
+  <div id="finalSummary" class="final-summary">
+    <div class="final-summary-header">
+      <h3>Resumen de tu solicitud</h3>
+      <p style="margin:0;color:#666">Revisa la información antes de confirmar el formulario. El resumen se actualiza automáticamente.</p>
+    </div>
+    <div id="finalSummaryBody" class="final-summary-body"></div>
 
-  <div><button class="btn" type="submit" id="submitBtn">Enviar solicitud</button></div>
+    <label id="privacyConfirmationBox" class="summary-confirm">
+      <input type="checkbox" name="Privacidad aceptada" value="Sí" required id="privacidad">
+      <span>
+        <strong>He leído la información sobre las condiciones de alojamiento y acepto la política de privacidad.</strong>
+        <br><small>Debes aceptar la política de privacidad para poder enviar la solicitud.</small>
+      </span>
+    </label>
+
+    <label id="summaryConfirmationBox" class="summary-confirm">
+      <input id="summaryConfirmation" type="checkbox" name="Resumen confirmado" value="Sí" required>
+      <span>
+        <strong>He revisado el resumen y confirmo que los datos son correctos.</strong>
+        <br><small>Si modificas cualquier dato del formulario, deberás volver a confirmar el resumen.</small>
+      </span>
+    </label>
+  </div>
+
+  <div class="field-error" id="privacidadError">Debes aceptar la política de privacidad para continuar.</div>
+  <div class="field-error" id="summaryConfirmationError">Debes revisar y confirmar el resumen antes de enviar la solicitud.</div>
+
+  <div style="margin-top:20px"><button class="btn" type="submit" id="submitBtn">Enviar solicitud</button></div>
   <div id="formResult" class="form-note" role="status" aria-live="polite"></div>
 </div>
 </form>
@@ -461,6 +501,7 @@ function updateTotalPeople(){
   if(summary) summary.value = parts.join('\n');
 
   applyCapacityState(total);
+  if(typeof updateFinalSummary==='function') updateFinalSummary();
   return total;
 }
 
@@ -737,6 +778,93 @@ function formatDateESGlobal(value){
   return `${d}/${m}/${y}`;
 }
 
+
+const accommodationForm=document.getElementById('accommodationForm');
+const finalSummary=document.getElementById('finalSummary');
+const finalSummaryBody=document.getElementById('finalSummaryBody');
+const privacyCheckbox=document.getElementById('privacidad');
+const summaryConfirmation=document.getElementById('summaryConfirmation');
+
+function escapeSummaryHtml(value){
+  return String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function summaryNights(){
+  const a=document.getElementById('fechaLlegada').value,b=document.getElementById('fechaSalida').value;
+  if(!a||!b) return 0;
+  return Math.max(0,Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000));
+}
+function roomSummaryHtml(){
+  const items=[];
+  document.querySelectorAll('.room-row').forEach(row=>{
+    const select=row.querySelector('.room-type'),qty=parseInt(row.querySelector('.room-qty').value||'0',10);
+    if(select.value&&qty>0) items.push(`<li><strong>${qty} × ${escapeSummaryHtml(select.options[select.selectedIndex].text)}</strong></li>`);
+  });
+  return items.length?`<ul class="summary-list">${items.join('')}</ul>`:'<p class="summary-empty">No se han indicado habitaciones.</p>';
+}
+function mealsSummaryHtml(){
+  const selected=[...document.querySelectorAll('.meal-request:checked')];
+  if(!selected.length) return '<p class="summary-empty">No se han solicitado comidas ni cenas.</p>';
+  return `<ul class="summary-list">${selected.map(c=>{
+    const n=c.closest('.meal-service-row').querySelector('.meal-people').value;
+    return `<li>${escapeSummaryHtml(formatDateESGlobal(c.dataset.date))}: <strong>${escapeSummaryHtml(c.dataset.label)} · ${escapeSummaryHtml(n)} persona${n==='1'?'':'s'}</strong></li>`;
+  }).join('')}</ul>`;
+}
+function breakfastSummaryHtml(){
+  const selected=[...document.querySelectorAll('.breakfast-request:checked')];
+  if(!selected.length) return '<p class="summary-empty">No se han solicitado desayunos picnic.</p>';
+  return `<ul class="summary-list">${selected.map(c=>{
+    const n=c.closest('.breakfast-group-row').querySelector('.breakfast-people').value;
+    return `<li>${escapeSummaryHtml(formatDateESGlobal(c.dataset.date))}: <strong>${escapeSummaryHtml(n)} desayuno${n==='1'?'':'s'} picnic</strong></li>`;
+  }).join('')}</ul>`;
+}
+function updateFinalSummary(){
+  const arrival=document.getElementById('fechaLlegada').value,departure=document.getElementById('fechaSalida').value;
+  const total=document.getElementById('totalPeople').value||'0',motivo=document.getElementById('motivo').value||'No indicado';
+  const regimen=document.querySelector('[name="Régimen"]').value||'';
+  const nombre=document.getElementById('nombre').value||'',apellido1=document.getElementById('apellido1').value||'';
+  const apellido2=document.querySelector('[name="Apellido 2"]').value||'',telefono=document.querySelector('[name="Teléfono"]').value||'';
+  const email=document.getElementById('email').value||'',obs=document.querySelector('[name="Observaciones"]').value.trim();
+
+  finalSummaryBody.innerHTML=`
+    <div class="summary-section"><h4>Estancia</h4><ul class="summary-list">
+      <li>Check-in: <strong>${escapeSummaryHtml(arrival?formatDateESGlobal(arrival):'No indicado')}</strong></li>
+      <li>Check-out: <strong>${escapeSummaryHtml(departure?formatDateESGlobal(departure):'No indicado')}</strong></li>
+      <li>Total de noches: <strong>${summaryNights()}</strong></li>
+      <li>Motivo: <strong>${escapeSummaryHtml(motivo)}</strong></li>
+    </ul></div>
+    <div class="summary-section"><h4>Alojamiento</h4>${roomSummaryHtml()}<ul class="summary-list">
+      <li>Total de personas: <strong>${escapeSummaryHtml(total)}</strong></li>
+      <li>Régimen: <strong>${escapeSummaryHtml(regimen)}</strong></li>
+    </ul></div>
+    <div class="summary-section"><h4>Comidas y cenas</h4>${mealsSummaryHtml()}</div>
+    <div class="summary-section"><h4>Desayuno picnic</h4>${breakfastSummaryHtml()}</div>
+    <div class="summary-section"><h4>Datos de contacto</h4><ul class="summary-list">
+      <li>Nombre: <strong>${escapeSummaryHtml([nombre,apellido1,apellido2].filter(Boolean).join(' ')||'No indicado')}</strong></li>
+      <li>Teléfono: <strong>${escapeSummaryHtml(telefono||'No indicado')}</strong></li>
+      <li>Email: <strong>${escapeSummaryHtml(email||'No indicado')}</strong></li>
+    </ul></div>
+    <div class="summary-section"><h4>Observaciones</h4>${obs?`<p style="margin:0">${escapeSummaryHtml(obs)}</p>`:'<p class="summary-empty">Sin observaciones.</p>'}</div>`;
+  updateSummaryConfirmationState();
+}
+function updateSummaryConfirmationState(){
+  finalSummary.classList.toggle('confirmed',privacyCheckbox.checked&&summaryConfirmation.checked);
+}
+function invalidateSummaryConfirmation(event){
+  if(event&&(event.target===privacyCheckbox||event.target===summaryConfirmation)) return;
+  if(summaryConfirmation.checked) summaryConfirmation.checked=false;
+  updateFinalSummary();
+}
+privacyCheckbox.addEventListener('change',()=>{
+  document.getElementById('privacidadError').style.display='none';
+  updateSummaryConfirmationState();
+});
+summaryConfirmation.addEventListener('change',()=>{
+  document.getElementById('summaryConfirmationError').style.display='none';
+  updateSummaryConfirmationState();
+});
+accommodationForm.addEventListener('input',invalidateSummaryConfirmation);
+accommodationForm.addEventListener('change',invalidateSummaryConfirmation);
+
 function markError(field, hasError){
   field.classList.toggle('has-error', hasError);
 }
@@ -784,6 +912,14 @@ function validateForm(form, total){
     privacidadError.style.display = 'none';
   }
 
+  const summaryError = document.getElementById('summaryConfirmationError');
+  if(!summaryConfirmation.checked){
+    summaryError.style.display = 'block';
+    valid = false;
+  } else {
+    summaryError.style.display = 'none';
+  }
+
   // Habitaciones seleccionadas
   const anyRoomSelected = Array.from(document.querySelectorAll('.room-row')).some(row => {
     return row.querySelector('.room-type').value && parseInt(row.querySelector('.room-qty').value || '0', 10) > 0;
@@ -814,10 +950,12 @@ async function submitAccommodation(e){
     return false;
   }
 
+  updateFinalSummary();
+
   if(!validateForm(form, total)){
     resultEl.textContent = 'Revisa los campos marcados en rojo antes de enviar la solicitud.';
     resultEl.classList.add('error');
-    const firstError = form.querySelector('.has-error, #privacidadError[style*="block"]');
+    const firstError = form.querySelector('.has-error, #privacidadError[style*="block"], #summaryConfirmationError[style*="block"]');
     if(firstError) firstError.scrollIntoView({behavior:'smooth', block:'center'});
     return false;
   }
@@ -919,6 +1057,8 @@ Email: ${email}`);
 
 document.querySelectorAll('.room-row').forEach(bindRoomRow);
 updateTotalPeople();
+updateFinalSummary();
+updateSummaryConfirmationState();
 </script>
 <section class="band"><div class="container"><h2>¿No sabes si este es tu recorrido?</h2><p class="lead">Vuelve a la Home y elige entre alojamiento, grupos, salas o varios servicios.</p><a class="btn" style="background:#fff;color:#9b1c31;border-color:#fff" href="index.html#necesidad">Volver a ¿Qué necesitas?</a></div></section>
 </main><footer><div class="container footer-grid"><div><strong>MARTÍ CODOLAR</strong><p>Prototipo V1.9 · Alojamiento integrado.</p></div><div><strong>Explorar</strong><p><a href="alojamiento.html">Alojamiento</a><br>Grupos<br>Salas y eventos<br>Jardines</p></div><div><strong>Información</strong><p>FAQ<br>Cómo llegar<br>Contacto<br>Privacidad</p></div></div></footer><div class="prototype">ALOJAMIENTO · PROTOTIPO V1.9</div></body></html>
