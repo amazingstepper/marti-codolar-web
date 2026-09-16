@@ -133,6 +133,92 @@
   .breakfast-controls{justify-content:flex-start;flex-wrap:wrap}
 }
 
+
+/* V7 · Picnic: réplica funcional/visual del patrón aprobado en Grupos */
+#breakfastPicnicSection .breakfast-group-row{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:24px !important;
+  padding:14px 0 !important;
+  border-top:1px solid #e9e2dc !important;
+}
+#breakfastPicnicSection .breakfast-group-row:first-child{border-top:0 !important}
+#breakfastPicnicSection .breakfast-group-row h4{
+  margin:0 0 3px !important;
+  font-size:1rem !important;
+  font-weight:700 !important;
+  text-transform:none !important;
+}
+#breakfastPicnicSection .included{font-size:.9rem;color:#666}
+#breakfastPicnicSection .breakfast-controls{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:12px !important;
+}
+#breakfastPicnicSection .picnic-switch{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  font-weight:400 !important;
+}
+#breakfastPicnicSection .picnic-switch input{
+  position:absolute !important;
+  opacity:0 !important;
+  width:1px !important;
+  height:1px !important;
+}
+#breakfastPicnicSection .picnic-toggle{
+  display:inline-block !important;
+  position:relative !important;
+  width:38px !important;
+  height:22px !important;
+  border-radius:999px !important;
+  background:#d6d2ce !important;
+  flex:0 0 38px !important;
+  cursor:pointer !important;
+}
+#breakfastPicnicSection .picnic-toggle::after{
+  content:"" !important;
+  position:absolute !important;
+  width:18px !important;
+  height:18px !important;
+  left:2px !important;
+  top:2px !important;
+  border-radius:50% !important;
+  background:#fff !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.18) !important;
+  transition:transform .18s ease !important;
+}
+#breakfastPicnicSection .picnic-switch input:checked + .picnic-toggle{background:#9b1c31 !important}
+#breakfastPicnicSection .picnic-switch input:checked + .picnic-toggle::after{transform:translateX(16px) !important}
+#breakfastPicnicSection .picnic-switch input:focus-visible + .picnic-toggle{
+  outline:2px solid #9b1c31 !important;
+  outline-offset:2px !important;
+}
+#breakfastPicnicSection .people-label{font-size:1rem;color:#444}
+#breakfastPicnicSection .breakfast-people{
+  width:68px !important;
+  height:36px !important;
+  min-height:36px !important;
+  padding:6px 9px !important;
+  border:1px solid #d5d0cb !important;
+  border-radius:2px !important;
+  background:#fff !important;
+  font:inherit !important;
+  box-sizing:border-box !important;
+}
+#breakfastPicnicSection .breakfast-people:disabled{
+  background:#f4f4f4 !important;
+  color:#777 !important;
+  opacity:1 !important;
+}
+@media(max-width:650px){
+  #breakfastPicnicSection .breakfast-group-row{grid-template-columns:1fr !important;gap:10px !important}
+  #breakfastPicnicSection .breakfast-controls{justify-content:flex-start !important}
+}
+
 </style>
 </head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
@@ -520,57 +606,77 @@ function renderMeals(){
   bindServiceNumbers(box);
 }
 function renderBreakfastPicnic(){
-  const section=document.getElementById('breakfastPicnicSection'), box=document.getElementById('breakfastDays');
-  if(!document.getElementById('breakfastPicnicCheckbox').checked){section.hidden=true;box.innerHTML='';return;}
-  section.hidden=false; box.innerHTML='';
+  const section=document.getElementById('breakfastPicnicSection');
+  const box=document.getElementById('breakfastDays');
+
+  if(!document.getElementById('breakfastPicnicCheckbox').checked){
+    section.hidden=true;
+    box.innerHTML='';
+    return;
+  }
+
+  section.hidden=false;
+  box.innerHTML='';
   const days=stayDaysInclusive().slice(1);
-  if(!days.length){box.innerHTML='<p class="form-note">Indica primero una estancia de al menos una noche.</p>';return;}
+
+  if(!days.length){
+    box.innerHTML='<p class="form-note">Indica primero una estancia de al menos una noche.</p>';
+    return;
+  }
 
   days.forEach(d=>{
-    const key=serviceDateKey(d), row=document.createElement('div');
+    const key=serviceDateKey(d);
+    const row=document.createElement('div');
     row.className='breakfast-group-row';
     row.innerHTML=`
-      <div>
+      <div class="breakfast-date">
         <h4>${servicePrettyDate(d)}</h4>
         <span class="included">Desayuno incluido</span>
       </div>
       <div class="breakfast-controls">
         <label class="picnic-switch">
           <span>Picnic</span>
-          <input type="checkbox" class="breakfast-request" data-date="${key}" aria-label="Solicitar desayuno picnic para ${servicePrettyDate(d)}">
+          <input type="checkbox" class="breakfast-request" data-date="${key}" aria-label="Picnic ${servicePrettyDate(d)}">
           <span class="picnic-toggle" aria-hidden="true"></span>
         </label>
         <span class="people-label">Personas</span>
-        <input type="number" class="breakfast-people" min="1" max="${maxGuests()}" value="${maxGuests()}" aria-label="Personas para desayuno picnic" disabled>
+        <input type="number" class="breakfast-people" min="1" max="${maxGuests()}" value="0" aria-label="Personas para picnic ${servicePrettyDate(d)}" disabled>
       </div>`;
     box.appendChild(row);
 
-    const check=row.querySelector('.breakfast-request');
-    const num=row.querySelector('.breakfast-people');
+    const toggle=row.querySelector('.breakfast-request');
+    const people=row.querySelector('.breakfast-people');
 
-    check.addEventListener('change',()=>{
-      num.disabled=!check.checked;
-      if(check.checked) num.value=maxGuests();
+    toggle.addEventListener('change',()=>{
+      people.disabled=!toggle.checked;
+      people.value=toggle.checked ? maxGuests() : 0;
     });
 
-    num.addEventListener('input',()=>{
+    people.addEventListener('input',()=>{
       const maximum=maxGuests();
-      num.max=maximum;
-      if(+num.value>maximum) num.value=maximum;
-      if(+num.value<1) num.value=1;
+      people.max=maximum;
+      if(people.value==='') return;
+      let value=parseInt(people.value,10);
+      if(Number.isNaN(value)) return;
+      if(value>maximum) people.value=maximum;
+      if(value<1) people.value=1;
     });
 
-    num.addEventListener('wheel', e=>{
-      if(document.activeElement===num){
+    people.addEventListener('blur',()=>{
+      if(toggle.checked && (!people.value || +people.value<1)) people.value=1;
+    });
+
+    people.addEventListener('wheel',e=>{
+      if(document.activeElement===people){
         e.preventDefault();
-        num.blur();
+        people.blur();
         window.scrollBy({top:e.deltaY,left:e.deltaX,behavior:'auto'});
       }
-    }, {passive:false});
+    },{passive:false});
 
-    num.addEventListener('dblclick',()=>{
-      num.focus();
-      num.select();
+    people.addEventListener('dblclick',()=>{
+      people.focus();
+      people.select();
     });
   });
 }
