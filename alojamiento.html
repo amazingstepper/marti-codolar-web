@@ -640,6 +640,7 @@ function bindMealSwitches(root){
     toggle.addEventListener('change',()=>{
       people.disabled=!toggle.checked;
       people.value=toggle.checked ? maxGuests() : 0;
+      refreshSummaryAfterEdit();
     });
     people.addEventListener('input',()=>{
       const maximum=maxGuests(); people.max=maximum;
@@ -648,6 +649,7 @@ function bindMealSwitches(root){
       if(Number.isNaN(value)) return;
       if(value>maximum) people.value=maximum;
       if(value<1) people.value=1;
+      refreshSummaryAfterEdit();
     });
     people.addEventListener('blur',()=>{if(toggle.checked&&(!people.value||+people.value<1)) people.value=1;});
     people.addEventListener('wheel',e=>{if(document.activeElement===people){e.preventDefault();people.blur();window.scrollBy({top:e.deltaY,left:e.deltaX,behavior:'auto'});}},{passive:false});
@@ -716,6 +718,7 @@ function renderBreakfastPicnic(){
     toggle.addEventListener('change',()=>{
       people.disabled=!toggle.checked;
       people.value=toggle.checked ? maxGuests() : 0;
+      refreshSummaryAfterEdit();
     });
 
     people.addEventListener('input',()=>{
@@ -726,10 +729,12 @@ function renderBreakfastPicnic(){
       if(Number.isNaN(value)) return;
       if(value>maximum) people.value=maximum;
       if(value<1) people.value=1;
+      refreshSummaryAfterEdit();
     });
 
     people.addEventListener('blur',()=>{
       if(toggle.checked && (!people.value || +people.value<1)) people.value=1;
+      refreshSummaryAfterEdit();
     });
 
     people.addEventListener('wheel',e=>{
@@ -750,8 +755,8 @@ function refreshServices(){
   renderMeals();
   renderBreakfastPicnic();
 }
-document.getElementById('mealsCheckbox').addEventListener('change',renderMeals);
-document.getElementById('breakfastPicnicCheckbox').addEventListener('change',renderBreakfastPicnic);
+document.getElementById('mealsCheckbox').addEventListener('change',()=>{renderMeals();refreshSummaryAfterEdit();});
+document.getElementById('breakfastPicnicCheckbox').addEventListener('change',()=>{renderBreakfastPicnic();refreshSummaryAfterEdit();});
 document.getElementById('fechaLlegada').addEventListener('change',refreshServices);
 document.getElementById('fechaSalida').addEventListener('change',refreshServices);
 document.getElementById('roomRows').addEventListener('input',()=>{ if(document.getElementById('mealsCheckbox').checked||document.getElementById('breakfastPicnicCheckbox').checked) refreshServices(); });
@@ -817,13 +822,22 @@ function breakfastSummaryHtml(){
     return `<li>${escapeSummaryHtml(formatDateESGlobal(c.dataset.date))}: <strong>${escapeSummaryHtml(n)} desayuno${n==='1'?'':'s'} picnic</strong></li>`;
   }).join('')}</ul>`;
 }
+
+function fieldValue(id,name){
+  const el=(id ? document.getElementById(id) : null) || (name ? document.querySelector(`[name="${name}"]`) : null);
+  return el ? String(el.value || '').trim() : '';
+}
 function updateFinalSummary(){
   const arrival=document.getElementById('fechaLlegada').value,departure=document.getElementById('fechaSalida').value;
-  const total=document.getElementById('totalPeople').value||'0',motivo=document.getElementById('motivo').value||'No indicado';
-  const regimen=document.querySelector('[name="Régimen"]').value||'';
-  const nombre=document.getElementById('nombre').value||'',apellido1=document.getElementById('apellido1').value||'';
-  const apellido2=document.querySelector('[name="Apellido 2"]').value||'',telefono=document.querySelector('[name="Teléfono"]').value||'';
-  const email=document.getElementById('email').value||'',obs=document.querySelector('[name="Observaciones"]').value.trim();
+  const total=fieldValue('totalPeople','Total de personas')||'0';
+  const motivo=fieldValue('motivo','Motivo de la estancia')||'No indicado';
+  const regimen=fieldValue('regimen','Régimen');
+  const nombre=fieldValue('nombre','Nombre');
+  const apellido1=fieldValue('apellido1','Apellido 1');
+  const apellido2=fieldValue('apellido2','Apellido 2');
+  const telefono=fieldValue('telefono','Teléfono');
+  const email=fieldValue('email','email');
+  const obs=fieldValue('observaciones','Observaciones');
 
   finalSummaryBody.innerHTML=`
     <div class="summary-section"><h4>Estancia</h4><ul class="summary-list">
@@ -849,6 +863,11 @@ function updateFinalSummary(){
 function updateSummaryConfirmationState(){
   finalSummary.classList.toggle('confirmed',privacyCheckbox.checked&&summaryConfirmation.checked);
 }
+
+function refreshSummaryAfterEdit(){
+  if(summaryConfirmation.checked) summaryConfirmation.checked=false;
+  updateFinalSummary();
+}
 function invalidateSummaryConfirmation(event){
   if(event&&(event.target===privacyCheckbox||event.target===summaryConfirmation)) return;
   if(summaryConfirmation.checked) summaryConfirmation.checked=false;
@@ -862,8 +881,8 @@ summaryConfirmation.addEventListener('change',()=>{
   document.getElementById('summaryConfirmationError').style.display='none';
   updateSummaryConfirmationState();
 });
-accommodationForm.addEventListener('input',invalidateSummaryConfirmation);
-accommodationForm.addEventListener('change',invalidateSummaryConfirmation);
+accommodationForm.addEventListener('input',invalidateSummaryConfirmation,true);
+accommodationForm.addEventListener('change',invalidateSummaryConfirmation,true);
 
 function markError(field, hasError){
   field.classList.toggle('has-error', hasError);
