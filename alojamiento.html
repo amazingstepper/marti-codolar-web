@@ -219,6 +219,96 @@
   #breakfastPicnicSection .breakfast-controls{justify-content:flex-start !important}
 }
 
+
+/* V8 · Comidas/cenas con el mismo patrón visual de conmutadores */
+#mealsSection .meal-group-row{
+  padding:14px 0;
+  border-top:1px solid #e9e2dc;
+}
+#mealsSection .meal-group-row:first-child{border-top:0}
+#mealsSection .meal-group-row h4{
+  margin:0 0 8px;
+  font-size:1rem;
+  font-weight:700;
+  text-transform:none;
+}
+#mealsSection .meal-service-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:24px;
+  align-items:center;
+  padding:8px 0;
+}
+#mealsSection .meal-name{font-weight:600}
+#mealsSection .meal-controls{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:12px;
+  white-space:nowrap;
+}
+#mealsSection .meal-switch{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-weight:400;
+  cursor:pointer;
+}
+#mealsSection .meal-switch input{
+  position:absolute;
+  opacity:0;
+  width:1px;
+  height:1px;
+}
+#mealsSection .meal-toggle{
+  display:inline-block;
+  position:relative;
+  width:38px;
+  height:22px;
+  border-radius:999px;
+  background:#d6d2ce;
+  flex:0 0 38px;
+}
+#mealsSection .meal-toggle::after{
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  left:2px;
+  top:2px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.18);
+  transition:transform .18s ease;
+}
+#mealsSection .meal-switch input:checked + .meal-toggle{background:#9b1c31}
+#mealsSection .meal-switch input:checked + .meal-toggle::after{transform:translateX(16px)}
+#mealsSection .meal-switch input:focus-visible + .meal-toggle{
+  outline:2px solid #9b1c31;
+  outline-offset:2px;
+}
+#mealsSection .meal-people-label{font-size:1rem;color:#444}
+#mealsSection .meal-people{
+  width:68px !important;
+  height:36px !important;
+  min-height:36px !important;
+  padding:6px 9px !important;
+  border:1px solid #d5d0cb !important;
+  border-radius:2px !important;
+  background:#fff !important;
+  font:inherit !important;
+  box-sizing:border-box !important;
+}
+#mealsSection .meal-people:disabled{
+  background:#f4f4f4 !important;
+  color:#777 !important;
+  opacity:1 !important;
+}
+@media(max-width:650px){
+  #mealsSection .meal-service-row{grid-template-columns:1fr;gap:8px}
+  #mealsSection .meal-controls{justify-content:flex-start}
+}
+
 </style>
 </head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
@@ -566,44 +656,85 @@ function stayDaysInclusive(){
 function maxGuests(){
   return Math.max(parseInt(document.getElementById('totalPeople').value||'0',10),1);
 }
-function mealLine(label,key){
-  return `<div class="service-line">
-    <label><input type="checkbox" class="meal-request" data-label="${label}" data-date="${key}"> ${label}</label>
-    <input type="number" class="meal-people" min="1" max="${maxGuests()}" value="${maxGuests()}" aria-label="Personas para ${label}" disabled>
+function mealServiceRow(label,key){
+  return `<div class="meal-service-row">
+    <span class="meal-name">${label}</span>
+    <div class="meal-controls">
+      <label class="meal-switch">
+        <span>Solicitar</span>
+        <input type="checkbox" class="meal-request" data-label="${label}" data-date="${key}" aria-label="Solicitar ${label}">
+        <span class="meal-toggle" aria-hidden="true"></span>
+      </label>
+      <span class="meal-people-label">Personas</span>
+      <input type="number" class="meal-people" min="1" max="${maxGuests()}" value="0" aria-label="Personas para ${label}" disabled>
+    </div>
   </div>`;
 }
-function bindServiceNumbers(root){
-  root.querySelectorAll('.service-line').forEach(line=>{
-    const check=line.querySelector('input[type=checkbox]');
-    const num=line.querySelector('input[type=number]');
-    check.addEventListener('change',()=>{num.disabled=!check.checked; if(check.checked) num.value=maxGuests();});
-    num.addEventListener('input',()=>{const m=maxGuests(); num.max=m; if(+num.value>m) num.value=m; if(+num.value<1) num.value=1;});
-    num.addEventListener('wheel', e => {
-      if(document.activeElement === num){
+function bindMealControls(root){
+  root.querySelectorAll('.meal-service-row').forEach(row=>{
+    const toggle=row.querySelector('.meal-request');
+    const people=row.querySelector('.meal-people');
+
+    toggle.addEventListener('change',()=>{
+      people.disabled=!toggle.checked;
+      people.value=toggle.checked ? maxGuests() : 0;
+    });
+
+    people.addEventListener('input',()=>{
+      const maximum=maxGuests();
+      people.max=maximum;
+      if(people.value==='') return;
+      let value=parseInt(people.value,10);
+      if(Number.isNaN(value)) return;
+      if(value>maximum) people.value=maximum;
+      if(value<1) people.value=1;
+    });
+
+    people.addEventListener('blur',()=>{
+      if(toggle.checked && (!people.value || +people.value<1)) people.value=1;
+    });
+
+    people.addEventListener('wheel',e=>{
+      if(document.activeElement===people){
         e.preventDefault();
-        num.blur();
+        people.blur();
         window.scrollBy({top:e.deltaY,left:e.deltaX,behavior:'auto'});
       }
-    }, {passive:false});
-    num.addEventListener('dblclick', () => { num.focus(); num.select(); });
+    },{passive:false});
+
+    people.addEventListener('dblclick',()=>{
+      people.focus();
+      people.select();
+    });
   });
 }
 function renderMeals(){
   const section=document.getElementById('mealsSection'), box=document.getElementById('mealsDays');
-  if(!document.getElementById('mealsCheckbox').checked){section.hidden=true;box.innerHTML='';return;}
-  section.hidden=false; box.innerHTML='';
+  if(!document.getElementById('mealsCheckbox').checked){
+    section.hidden=true;
+    box.innerHTML='';
+    return;
+  }
+  section.hidden=false;
+  box.innerHTML='';
+
   const days=stayDaysInclusive();
-  if(!days.length){box.innerHTML='<p class="form-note">Indica primero unas fechas de llegada y salida válidas.</p>';return;}
+  if(!days.length){
+    box.innerHTML='<p class="form-note">Indica primero unas fechas de llegada y salida válidas.</p>';
+    return;
+  }
+
   days.forEach((d,i)=>{
     const key=serviceDateKey(d), first=i===0, last=i===days.length-1;
-    const el=document.createElement('div'); el.className='service-day';
-    let lines='';
-    if(!first) lines+=mealLine('Comida',key);
-    if(!last) lines+=mealLine('Cena',key);
-    el.innerHTML=`<h4>${servicePrettyDate(d)}</h4>${lines}`;
-    box.appendChild(el);
+    const day=document.createElement('div');
+    day.className='meal-group-row';
+    let services='';
+    if(!first) services += mealServiceRow('Comida',key);
+    if(!last) services += mealServiceRow('Cena',key);
+    day.innerHTML=`<h4>${servicePrettyDate(d)}</h4>${services}`;
+    box.appendChild(day);
   });
-  bindServiceNumbers(box);
+  bindMealControls(box);
 }
 function renderBreakfastPicnic(){
   const section=document.getElementById('breakfastPicnicSection');
@@ -694,7 +825,7 @@ function selectedMealsText(){
   const rows=[...document.querySelectorAll('.meal-request:checked')];
   if(!rows.length) return 'No solicita comidas ni cenas.';
   return rows.map(c=>{
-    const n=c.closest('.service-line').querySelector('.meal-people').value;
+    const n=c.closest('.meal-service-row').querySelector('.meal-people').value;
     return `${formatDateESGlobal(c.dataset.date)} · ${c.dataset.label} · ${n} persona${n==='1'?'':'s'}`;
   }).join('\n');
 }
