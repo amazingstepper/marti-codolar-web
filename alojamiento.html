@@ -405,6 +405,35 @@
   white-space:nowrap;
 }
 
+
+/* V22 · Único cambio sobre V21: título más ligero y compacto */
+.page-hero h1{
+  font-size:clamp(3rem,6.2vw,5.8rem) !important;
+  line-height:.88 !important;
+  margin-top:18px !important;
+  margin-bottom:34px !important;
+}
+.page-hero h1 > span{
+  display:block;
+  text-align:center;
+}
+.page-hero h1 > span:nth-child(2){
+  font-size:.48em;
+  line-height:1.35;
+  margin:.10em 0 .06em;
+  font-weight:500;
+}
+.page-hero h1 .hero-name{
+  white-space:nowrap;
+}
+@media(max-width:600px){
+  .page-hero h1{
+    font-size:clamp(2.7rem,13vw,4rem) !important;
+    line-height:.9 !important;
+    margin-bottom:28px !important;
+  }
+}
+
 </style>
 </head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
