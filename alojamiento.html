@@ -306,6 +306,65 @@
   .group-route .btn{width:100%;text-align:center}
 }
 
+
+/* V16 · Hero centrado */
+.hero .hero-grid{display:block}
+.hero .hero-copy{max-width:980px;margin:0 auto;text-align:center}
+.hero .hero-copy .eyebrow{justify-content:center}
+.hero .hero-copy h1{max-width:920px;margin-left:auto;margin-right:auto}
+.hero .hero-copy .lead{max-width:820px;margin-left:auto;margin-right:auto}
+.hero .hero-copy .hero-actions{justify-content:center}
+@media(max-width:700px){
+  .hero .hero-copy{text-align:center}
+  .hero .hero-copy h1{font-size:clamp(2.7rem,14vw,4.3rem)}
+}
+
+
+/* V16 · Fotografías reales provisionales */
+.room-mosaic-real{
+  grid-template-columns:1.55fr .8fr .8fr;
+  grid-template-rows:1fr 1fr;
+  min-height:520px;
+}
+.room-mosaic-real .room-photo-main{grid-column:1/2;grid-row:1/3}
+.room-mosaic-real .room-photo:nth-child(2){grid-column:2/3;grid-row:1/2}
+.room-mosaic-real .room-photo:nth-child(3){grid-column:3/4;grid-row:1/2}
+.room-mosaic-real .room-photo-extra{grid-column:2/4;grid-row:2/3}
+.room-mosaic-real .room-photo{margin:0;background:#e9e2dc}
+.room-mosaic-real img{display:block;width:100%;height:100%;object-fit:cover}
+.room-mosaic-real .room-photo-main img{object-position:center center}
+.room-mosaic-real .room-photo:nth-child(2) img{object-position:center center}
+.room-mosaic-real .room-photo:nth-child(3) img{object-position:center center}
+.room-mosaic-real .room-photo-extra img{object-position:center 55%}
+@media(max-width:850px){
+  .room-mosaic-real{
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:330px 210px 210px;
+    min-height:0;
+  }
+  .room-mosaic-real .room-photo-main{grid-column:1/3;grid-row:1/2}
+  .room-mosaic-real .room-photo:nth-child(2){grid-column:1/2;grid-row:2/3}
+  .room-mosaic-real .room-photo:nth-child(3){grid-column:2/3;grid-row:2/3}
+  .room-mosaic-real .room-photo-extra{grid-column:1/3;grid-row:3/4}
+}
+@media(max-width:600px){
+  .room-mosaic-real{
+    display:flex;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    gap:10px;
+    padding-bottom:6px;
+  }
+  .room-mosaic-real .room-photo,
+  .room-mosaic-real .room-photo-main,
+  .room-mosaic-real .room-photo-extra{
+    flex:0 0 88%;
+    min-height:270px;
+    height:270px;
+    scroll-snap-align:start;
+  }
+}
+
 </style>
 </head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
@@ -321,25 +380,27 @@
       <p>Habitaciones privadas en un entorno singular, con desayuno incluido y los servicios necesarios para estancias por motivos laborales, formativos u hospitalarios.</p>
     </div>
 
-    <div class="room-mosaic" aria-label="Galería de la Hospedería">
-      <div class="room-photo room-photo-main">
-        <div class="photo-placeholder">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 35V17m0 12h34v6M11 29v-9h12a6 6 0 0 1 6 6v3m-18-9v9M7 35v5m34-5v5"/></svg>
-          <span>Fotografía principal de habitación</span>
-        </div>
-      </div>
-      <div class="room-photo">
-        <div class="photo-placeholder">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 37h32V11H8v26Zm5-5 8-9 6 6 4-5 7 8M31 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
-          <span>Detalle de habitación</span>
-        </div>
-      </div>
-      <div class="room-photo">
-        <div class="photo-placeholder">
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M13 8v32m22-32v32M13 13h22M13 35h22M19 20h10v9H19z"/></svg>
-          <span>Baño / instalaciones</span>
-        </div>
-      </div>
+    <div class="room-mosaic room-mosaic-real" aria-label="Galería de habitaciones de la Hospedería">
+      <figure class="room-photo room-photo-main">
+        <img src="images/alojamiento/habitacion-doble-principal.jpg"
+             alt="Habitación doble de la Hospedería de Martí Codolar con dos camas y vistas al exterior"
+             loading="eager" decoding="async">
+      </figure>
+      <figure class="room-photo">
+        <img src="images/alojamiento/habitacion-doble-entrada.jpg"
+             alt="Vista de una habitación doble de la Hospedería desde la entrada"
+             loading="lazy" decoding="async">
+      </figure>
+      <figure class="room-photo">
+        <img src="images/alojamiento/bano-habitacion.jpg"
+             alt="Baño privado de una habitación de la Hospedería"
+             loading="lazy" decoding="async">
+      </figure>
+      <figure class="room-photo room-photo-extra">
+        <img src="images/alojamiento/habitacion-doble-detalle.jpg"
+             alt="Detalle de las camas de una habitación doble de la Hospedería"
+             loading="lazy" decoding="async">
+      </figure>
     </div>
 
     <div class="room-caption">
