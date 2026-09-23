@@ -457,6 +457,22 @@
   }
 }
 
+
+/* V25 · Corrección exclusiva del centrado geométrico del H2 */
+@media (min-width:900px){
+  .stay-intro h2{
+    position:relative;
+    left:50%;
+    transform:translateX(-50%);
+    width:max-content !important;
+    max-width:calc(100vw - 48px) !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+    text-align:center !important;
+    white-space:nowrap;
+  }
+}
+
 </style>
 </head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
