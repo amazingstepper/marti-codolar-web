@@ -1,6 +1,6 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Martí Codolar — Prototipo Home V1.11</title><link rel="stylesheet" href="style.css"></head><body>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Martí Codolar — Prototipo Home V1.12</title><link rel="stylesheet" href="style.css"></head><body>
 <div class="topbar"><div class="container"><span>Barcelona</span><span>ES · CA · EN</span></div></div>
-<header><div class="container nav"><a class="logo brand-lockup" href="index.html" aria-label="Martí Codolar - Inicio"><img class="brand-mark" src="images/logo vector_1.png" alt="" aria-hidden="true"><span class="brand-name">MARTÍ CODOLAR</span></a><nav><a href="alojamiento.html">Alojamiento</a><a href="grupos.html">Grupos</a><a href="salas.html">Salas y eventos</a><a href="#jardines">Jardines</a><a href="#historia">Martí Codolar</a><a href="#contacto">Contacto</a></nav><div><a class="btn secondary" href="#necesidad">Consultar</a><button class="menu">☰</button></div></div></header>
+<header><div class="container nav"><a class="logo brand-lockup" href="index.html" aria-label="Martí Codolar - Inicio"><img class="brand-mark" src="images/logo vector_1.png" alt="" aria-hidden="true"><span class="brand-name">MARTÍ CODOLAR</span></a><nav id="main-navigation" aria-label="Navegación principal"><a href="alojamiento.html">Alojamiento</a><a href="grupos.html">Grupos</a><a href="salas.html">Salas y eventos</a><a href="#jardines">Jardines</a><a href="#historia">Martí Codolar</a><a href="#contacto">Contacto</a></nav><div class="nav-actions"><a class="btn secondary nav-cta" href="#necesidad">Consultar</a><button class="menu" id="mobileMenuToggle" type="button" aria-label="Abrir menú" aria-controls="main-navigation" aria-expanded="false"><span></span><span></span><span></span></button></div></div></header>
 <main>
 <section class="hero"><div class="container hero-content"><div class="eyebrow">Martí Codolar · Barcelona</div><h1>Martí Codolar</h1><p>Alojamiento, grupos, salas y jardines en un entorno histórico y tranquilo de Barcelona.</p><img class="hero-mark" src="images/logo vector_1.png" alt="" aria-hidden="true"><a class="btn" href="#necesidad">Consultar disponibilidad y precios</a></div></section>
 <section id="necesidad"><div class="container"><div class="eyebrow" style="color:#9b1c31">Empecemos por ti</div><h2>¿Qué necesitas?</h2><p class="lead">No necesitas conocer de antemano qué alojamiento o sala te corresponde. Cuéntanos qué quieres organizar y te encaminamos a la opción adecuada.</p>
@@ -11,5 +11,37 @@
 <section id="jardines"><div class="container split"><div class="photo"></div><div><div class="eyebrow" style="color:#9b1c31">Historia y naturaleza</div><h2>Un entorno singular dentro de Barcelona</h2><p class="lead">Jardines, patrimonio, edificios históricos y la identidad salesiana forman parte de aquello que diferencia a Martí Codolar.</p></div></div></section>
 <section class="soft" id="historia"><div class="container"><div class="eyebrow" style="color:#9b1c31">Martí Codolar</div><h2>Hospitalidad con historia</h2></div></section>
 <section class="band" id="contacto"><div class="container"><h2>Cuéntanos qué necesitas</h2><p class="lead">Empieza por tu necesidad y prepararemos una solicitud útil para reservas.</p><a class="btn" style="background:#fff;color:#9b1c31;border-color:#fff" href="#necesidad">Consultar disponibilidad y precios</a></div></section>
-</main><footer><div class="container footer-grid"><div><strong>MARTÍ CODOLAR</strong><p>Prototipo V1.11.</p></div><div><strong>Explorar</strong><p><a href="alojamiento.html">Alojamiento</a><br>Grupos<br>Salas y eventos<br>Jardines</p></div><div><strong>Información</strong><p>FAQ<br>Cómo llegar<br>Contacto<br>Privacidad</p></div></div></footer><div class="prototype">PROTOTIPO HOME V1.11</div></body></html>
+</main><footer><div class="container footer-grid"><div><strong>MARTÍ CODOLAR</strong><p>Prototipo V1.12.</p></div><div><strong>Explorar</strong><p><a href="alojamiento.html">Alojamiento</a><br>Grupos<br>Salas y eventos<br>Jardines</p></div><div><strong>Información</strong><p>FAQ<br>Cómo llegar<br>Contacto<br>Privacidad</p></div></div></footer><div class="prototype">PROTOTIPO HOME V1.12</div><script>
+(function(){
+  const toggle = document.getElementById('mobileMenuToggle');
+  const nav = document.getElementById('main-navigation');
+  if(!toggle || !nav) return;
 
+  function setMenu(open){
+    nav.classList.toggle('is-open', open);
+    toggle.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    document.body.classList.toggle('mobile-menu-open', open);
+  }
+
+  toggle.addEventListener('click', function(){
+    setMenu(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+
+  nav.querySelectorAll('a').forEach(function(link){
+    link.addEventListener('click', function(){ setMenu(false); });
+  });
+
+  document.addEventListener('keydown', function(event){
+    if(event.key === 'Escape'){
+      setMenu(false);
+      toggle.focus();
+    }
+  });
+
+  window.addEventListener('resize', function(){
+    if(window.innerWidth >= 760) setMenu(false);
+  });
+})();
+</script></body></html>
